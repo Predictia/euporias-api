@@ -3,8 +3,6 @@ package eu.euporias.api.model;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.persistence.Column;
-
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -21,12 +19,11 @@ public class User {
 	
     @Email
     @NotBlank
-    @Column(unique=true)
     private String email;
     private String firstName;
     private String lastName;
     private Date dateJoined;
-    private String[] tags;
+    private String[] prototypes;
     private HashMap<String, Object> attributes;
     
     public String getId() {
@@ -86,15 +83,15 @@ public class User {
 		this.dateJoined = dateJoined;
 	}
 
-	public String[] getTags() {
-        return tags;
-    }
-	
-    public void setTags(String[] tags) {
-        this.tags = tags;
-    }
+	public String[] getPrototypes() {
+		return prototypes;
+	}
 
-    public HashMap<String, Object> getAttributes() {
+	public void setPrototypes(String[] prototypes) {
+		this.prototypes = prototypes;
+	}
+
+	public HashMap<String, Object> getAttributes() {
         return attributes;
     }
     
@@ -103,4 +100,3 @@ public class User {
     }
 
 }
-
