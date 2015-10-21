@@ -4,9 +4,11 @@ import java.util.HashMap;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orientechnologies.orient.core.annotation.OId;
 import com.orientechnologies.orient.core.annotation.OVersion;
 
+@JsonIgnoreProperties("handler")
 public class Product {
 	
 	@OId

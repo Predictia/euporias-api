@@ -6,4 +6,6 @@ import eu.euporias.api.model.User;
 
 public interface UserRepository extends OrientObjectRepository<User> {
 	
+	public User findByEmail(String email);
+	
 }

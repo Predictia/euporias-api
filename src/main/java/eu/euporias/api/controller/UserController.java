@@ -3,6 +3,10 @@ package eu.euporias.api.controller;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +18,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,7 +50,7 @@ public class UserController {
     @RequestMapping(value="/user/{email}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<UserResource> user(@PathVariable(value = "email") String email) {
-    	User user = userService.getRepo().findOne(email);
+    	User user = userService.getRepo().findByEmail(email);
     	UserResource resource = new UserResource(user);
     	resource.add(linkTo(methodOn(UserController.class).user(email)).withSelfRel());
     	resource.add(linkTo(methodOn(UserController.class).index(null, null)).withRel("users"));
@@ -52,6 +58,18 @@ public class UserController {
         	resource, 
         	user == null ? HttpStatus.NOT_FOUND : HttpStatus.OK
         );
+    }
+    
+    @RequestMapping(value="/user", method=RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public HttpEntity<?> user(@Valid @RequestBody User user, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
+        	User pUser = userService.getRepo().save(user);
+        	return user(pUser.getEmail());
+        }else{
+        	LOGGER.info("Invalid user requested: {}", bindingResult.getFieldError());
+        	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -72,5 +90,7 @@ public class UserController {
 
     @Autowired private PagedResourcesAssembler<User> assembler;
     @Autowired private UserService userService;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     
 }

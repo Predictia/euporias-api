@@ -2,9 +2,11 @@ package eu.euporias.api.model;
 
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orientechnologies.orient.core.annotation.OId;
 import com.orientechnologies.orient.core.annotation.OVersion;
 
+@JsonIgnoreProperties("handler")
 public class Outcome {
 	
     @OId

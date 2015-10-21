@@ -1,5 +1,7 @@
 package eu.euporias.api.service;
 
+import javax.validation.ValidationException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +45,7 @@ public class UserServiceTest {
 		}
 	}
 	
-
-	@Test
+	@Test(expected=ValidationException.class)
 	public void testInvalidEmailUser() throws Exception{
 		User u = userService.getRepo().save(createTestUser("kk"));
 		userService.getRepo().delete(u);
