@@ -34,6 +34,16 @@ public class UserServiceTest {
 		}
 	}
 	
+	@Test
+	public void testFindUserByEmail() throws Exception{
+		User u = userService.getRepo().save(createTestUser());
+		try{
+			Assert.assertNotNull(userService.getRepo().findByEmail(u.getEmail()));
+		}finally{
+			userService.getRepo().delete(u);
+		}
+	}
+	
 	@Test(expected=ORecordDuplicatedException.class)
 	public void testUniqueEmailUser() throws Exception{
 		User u = userService.getRepo().save(createTestUser());
