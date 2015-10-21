@@ -6,16 +6,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
 @Table(name="products", refreshInterval=500, numberOfReplicas="0-all")
-@JsonTypeInfo(use=com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS, include=As.PROPERTY, property="class")
 public class Product {
 
 	@Id
 	@NotBlank
-	private String id;
+	private String productId;
 	
 	@NotBlank
 	private String prototype;
@@ -23,6 +19,14 @@ public class Product {
 	@NotBlank
 	private String name;
 	
+	public String getProductId() {
+		return productId;
+	}
+
+	public void setProductId(String productId) {
+		this.productId = productId;
+	}
+
 	private HashMap<String, Object> parameters;
 
 	public String getPrototype() {

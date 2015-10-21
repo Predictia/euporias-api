@@ -6,16 +6,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
 @Table(name="outcomes", refreshInterval=500, numberOfReplicas="0-all")
-@JsonTypeInfo(use=com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS, include=As.PROPERTY, property="class")
 public class Outcome {
 	
 	@Id
 	@NotBlank
-	private String id;
+	private String outcomeId;
 	
 	@NotBlank
 	private String productId;
@@ -24,12 +20,12 @@ public class Outcome {
 	
 	private Object[] results;
 	
-	public String getId() {
-		return id;
+	public String getOutcomeId() {
+		return outcomeId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setOutcomeId(String outcomeId) {
+		this.outcomeId = outcomeId;
 	}
 
 	public String getProductId() {

@@ -8,12 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.crate.core.mapping.annotations.Table;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
-
 @Table(name="users", refreshInterval=500, numberOfReplicas="0-all")
-@JsonTypeInfo(use=com.fasterxml.jackson.annotation.JsonTypeInfo.Id.CLASS, include=As.PROPERTY, property="class")
 public class User {
 
     @Id
@@ -45,14 +40,7 @@ public class User {
         this.tags = tags;
         this.attributes = attributes;
     }
-
-    public String getId() {
-        return this.email;
-    }
-    public void setId(String email) {
-        this.email = email;
-    }
-
+    
     public String getFirstName() {
         return firstName;
     }

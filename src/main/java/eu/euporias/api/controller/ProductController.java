@@ -12,7 +12,7 @@ import eu.euporias.api.service.ProductService;
 @RestController
 public class ProductController {
 
-    @RequestMapping("/product")
+    @RequestMapping("/products")
     public Collection<Product> index() {
     	productService.refresh();
         return productService.getRepo().findAll();
