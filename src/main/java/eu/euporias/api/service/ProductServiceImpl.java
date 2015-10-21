@@ -7,7 +7,7 @@ import eu.euporias.api.model.Product;
 import eu.euporias.api.repository.ProductRepository;
 
 @Service("productService")
-public class ProductServiceImpl extends AbstractCrateService<Product, ProductRepository, String> implements ProductService {
+public class ProductServiceImpl extends AbstractService<Product, ProductRepository> implements ProductService {
 
 	@Autowired
     public ProductServiceImpl(ProductRepository productRepository) {

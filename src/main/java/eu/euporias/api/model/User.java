@@ -1,49 +1,54 @@
 package eu.euporias.api.model;
 
+import java.util.Date;
 import java.util.HashMap;
+
+import javax.persistence.Column;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.crate.core.mapping.annotations.Table;
 
-@Table(name="users", refreshInterval=500, numberOfReplicas="0-all")
+import com.orientechnologies.orient.core.annotation.OId;
+import com.orientechnologies.orient.core.annotation.OVersion;
+
 public class User {
 
-    @Id
+	@OId
+	private String id;
+
+	@OVersion
+	private Long version;
+	
     @Email
     @NotBlank
+    @Column(unique=true)
     private String email;
     private String firstName;
     private String lastName;
-    private Long dateJoined;
+    private Date dateJoined;
     private String[] tags;
     private HashMap<String, Object> attributes;
-
-    @PersistenceConstructor
-    public User(String firstName, String lastName, String email, Long dateJoined) {
-        this(firstName, lastName, email, dateJoined, new String[]{});
-    }
-
-    @PersistenceConstructor
-    public User(String firstName, String lastName, String email, Long dateJoined, String[] tags) {
-        this(firstName, lastName, email, dateJoined, tags, new HashMap<String, Object>());
-    }
-
-    @PersistenceConstructor
-    public User(String firstName, String lastName, String email, Long dateJoined, String[] tags, HashMap<String, Object> attributes) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.dateJoined = dateJoined;
-        this.tags = tags;
-        this.attributes = attributes;
-    }
     
-    public String getFirstName() {
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
+	public String getFirstName() {
         return firstName;
     }
+	
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -51,6 +56,7 @@ public class User {
     public String getLastName() {
         return lastName;
     }
+    
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -58,6 +64,7 @@ public class User {
     public String getFullName() {
         return String.format("%s %s", this.firstName, this.lastName);
     }
+    
     public void setFullName(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -66,20 +73,23 @@ public class User {
     public String getEmail() {
         return email;
     }
+    
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public Long getDateJoined() {
-        return dateJoined;
-    }
-    public void setDateJoined(Long dateJoined) {
-        this.dateJoined = dateJoined;
-    }
+    public Date getDateJoined() {
+		return dateJoined;
+	}
 
-    public String[] getTags() {
+	public void setDateJoined(Date dateJoined) {
+		this.dateJoined = dateJoined;
+	}
+
+	public String[] getTags() {
         return tags;
     }
+	
     public void setTags(String[] tags) {
         this.tags = tags;
     }
@@ -87,14 +97,9 @@ public class User {
     public HashMap<String, Object> getAttributes() {
         return attributes;
     }
+    
     public void setAttributes(HashMap<String, Object> attributes) {
         this.attributes = attributes;
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                "User[firstName='%s', lastName='%s']", firstName, lastName);
     }
 
 }

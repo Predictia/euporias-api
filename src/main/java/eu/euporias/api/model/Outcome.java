@@ -2,38 +2,46 @@ package eu.euporias.api.model;
 
 import java.util.HashMap;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.crate.core.mapping.annotations.Table;
+import com.orientechnologies.orient.core.annotation.OId;
+import com.orientechnologies.orient.core.annotation.OVersion;
 
-@Table(name="outcomes", refreshInterval=500, numberOfReplicas="0-all")
 public class Outcome {
 	
-	@Id
-	@NotBlank
-	private String outcomeId;
+    @OId
+    private String id;
+    
+    @OVersion
+    private Long version;
 	
-	@NotBlank
-	private String productId;
+	private Product product;
 	
 	private HashMap<String, Object> parameters;
 	
 	private Object[] results;
 	
-	public String getOutcomeId() {
-		return outcomeId;
+	
+	public String getId() {
+		return id;
 	}
 
-	public void setOutcomeId(String outcomeId) {
-		this.outcomeId = outcomeId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getProductId() {
-		return productId;
+	public Long getVersion() {
+		return version;
 	}
 
-	public void setProductId(String productId) {
-		this.productId = productId;
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public HashMap<String, Object> getParameters() {

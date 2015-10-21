@@ -14,7 +14,6 @@ public class OutcomeController {
 
     @RequestMapping("/outcomes")
     public List<Outcome> index() {
-    	outcomeService.refresh();
         return outcomeService.getRepo().findAll();
     }
     
