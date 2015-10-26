@@ -7,7 +7,7 @@ import eu.euporias.api.model.Outcome;
 import eu.euporias.api.repository.OutcomeRepository;
 
 @Service("outcomeService")
-public class OutcomeServiceImpl extends AbstractService<Outcome, OutcomeRepository> implements OutcomeService {
+public class OutcomeServiceImpl extends AbstractService<Outcome, Long, OutcomeRepository> implements OutcomeService {
 
 	@Autowired
     public OutcomeServiceImpl(OutcomeRepository outcomeRepository) {

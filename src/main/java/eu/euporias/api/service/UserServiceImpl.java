@@ -7,7 +7,7 @@ import eu.euporias.api.model.User;
 import eu.euporias.api.repository.UserRepository;
 
 @Service("userService")
-public class UserServiceImpl extends AbstractService<User, UserRepository> implements UserService {
+public class UserServiceImpl extends AbstractService<User, Long, UserRepository> implements UserService {
 
 	@Autowired
     public UserServiceImpl(UserRepository userRepository) {

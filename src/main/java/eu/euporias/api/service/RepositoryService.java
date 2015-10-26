@@ -1,8 +1,10 @@
 package eu.euporias.api.service;
 
-import org.springframework.data.orient.object.repository.OrientObjectRepository;
+import java.io.Serializable;
 
-public interface RepositoryService<T, R extends OrientObjectRepository<T>> {
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+public interface RepositoryService<T, ID extends Serializable, R extends PagingAndSortingRepository<T, ID>> {
 
 	public R getRepo();
 	

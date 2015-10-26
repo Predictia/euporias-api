@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.euporias.api.model.User;
 import eu.euporias.api.service.UserService;
 
-@RestController
+//@RestController
 public class UserController {
 
     private static final String DEFAULT_PAGE = "0";

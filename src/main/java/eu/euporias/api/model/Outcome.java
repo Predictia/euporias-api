@@ -1,41 +1,35 @@
 package eu.euporias.api.model;
 
-import java.util.HashMap;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.orientechnologies.orient.core.annotation.OId;
-import com.orientechnologies.orient.core.annotation.OVersion;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
-@JsonIgnoreProperties("handler")
+@Entity
 public class Outcome {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 	
-    @OId
-    private String id;
-    
-    @OVersion
-    private Long version;
-	
+	@ManyToOne
 	private Product product;
 	
-	private HashMap<String, Object> parameters;
+	@ElementCollection(targetClass=String.class)
+	private Map<String, String> parameters;
 	
 	private Object[] results;
 	
-	
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
 	}
 
 	public Product getProduct() {
@@ -46,11 +40,11 @@ public class Outcome {
 		this.product = product;
 	}
 
-	public HashMap<String, Object> getParameters() {
+	public Map<String, String> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(HashMap<String, Object> parameters) {
+	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
 

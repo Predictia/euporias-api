@@ -1,5 +1,9 @@
 package eu.euporias.api.service;
 
+import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.validation.ValidationException;
 
 import org.junit.Assert;
@@ -7,11 +11,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import eu.euporias.api.ApiApplication;
 import eu.euporias.api.model.User;
@@ -26,7 +29,7 @@ public class UserServiceTest {
 	public void testSaveUser() throws Exception{
 		User u = userService.getRepo().save(createTestUser());
 		try{
-			Assert.assertEquals(testPrototypeName, u.getPrototypes()[0]);
+			Assert.assertEquals(testPrototypeName, u.getPrototypes().iterator().next());
 			Assert.assertNotNull(u.getEmail());
 			Assert.assertNotNull(u.getFirstName());
 		}finally{
@@ -36,15 +39,17 @@ public class UserServiceTest {
 	
 	@Test
 	public void testFindUserByEmail() throws Exception{
-		User u = userService.getRepo().save(createTestUser());
+		String email = "test@user.net";
+		User u = userService.getRepo().save(createTestUser(email));
 		try{
-			Assert.assertNotNull(userService.getRepo().findByEmail(u.getEmail()));
+			User oUser = userService.getRepo().findByEmail(email);
+			Assert.assertEquals(email, oUser.getEmail());
 		}finally{
 			userService.getRepo().delete(u);
 		}
 	}
 	
-	@Test(expected=ORecordDuplicatedException.class)
+	@Test(expected=DataIntegrityViolationException.class)
 	public void testUniqueEmailUser() throws Exception{
 		User u = userService.getRepo().save(createTestUser());
 		try{
@@ -69,7 +74,7 @@ public class UserServiceTest {
 		User user = new User();
 		user.setFullName("test", "user");
 		user.setEmail(email);
-		user.setPrototypes(new String[]{testPrototypeName});
+		user.setPrototypes(Stream.of(testPrototypeName).collect(Collectors.toCollection(HashSet::new)));
 		return user;
 	}
 	

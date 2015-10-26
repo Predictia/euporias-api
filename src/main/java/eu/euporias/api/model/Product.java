@@ -1,21 +1,21 @@
 package eu.euporias.api.model;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.orientechnologies.orient.core.annotation.OId;
-import com.orientechnologies.orient.core.annotation.OVersion;
-
-@JsonIgnoreProperties("handler")
+@Entity
 public class Product {
-	
-	@OId
-	private String id;
 
-	@OVersion
-	private Long version;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 	
 	@NotBlank
 	private String prototype;
@@ -23,22 +23,15 @@ public class Product {
 	@NotBlank
 	private String name;
 	
-	private HashMap<String, Object> parameters;
+	@ElementCollection(targetClass=String.class)
+	private Map<String, String> parameters;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
 	}
 
 	public String getPrototype() {
@@ -57,11 +50,11 @@ public class Product {
 		this.name = name;
 	}
 
-	public HashMap<String, Object> getParameters() {
+	public Map<String, String> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(HashMap<String, Object> parameters) {
+	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
 	
