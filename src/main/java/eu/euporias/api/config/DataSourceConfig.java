@@ -12,7 +12,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-public class DataSourceConfiguration {
+public class DataSourceConfig {
 
 	@Bean
 	public DataSource primaryDataSource() {

@@ -15,6 +15,8 @@ import javax.persistence.ManyToMany;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class User {
 
@@ -28,6 +30,10 @@ public class User {
 	private String email;
 	private String firstName;
 	private String lastName;
+	
+	@JsonIgnore 
+	private String password; 
+	
 	private Date dateJoined;
 	
 	@ManyToMany
@@ -68,6 +74,14 @@ public class User {
 	public void setFullName(String firstName, String lastName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getEmail() {

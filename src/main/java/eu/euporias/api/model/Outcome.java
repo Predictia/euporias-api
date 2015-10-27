@@ -6,10 +6,14 @@ import java.util.Map;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 public class Outcome {
@@ -27,6 +31,7 @@ public class Outcome {
 	@ElementCollection(targetClass=String.class)
 	private Map<String, String> parameters;
 	
+	@Enumerated(EnumType.STRING)
 	private OutcomeType outcomeType;
 	
 	private String format;
@@ -36,7 +41,8 @@ public class Outcome {
 	@ElementCollection
 	private List<String> results;
 	
-	private Date generatedDate;
+	@LastModifiedDate 
+	private Date lastModifiedDate;  
 	
 	public Long getId() {
 		return id;
@@ -102,12 +108,12 @@ public class Outcome {
 		this.results = results;
 	}
 
-	public Date getGeneratedDate() {
-		return generatedDate;
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
 	}
 
-	public void setGeneratedDate(Date generatedDate) {
-		this.generatedDate = generatedDate;
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 }

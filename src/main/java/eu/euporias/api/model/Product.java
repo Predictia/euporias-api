@@ -1,12 +1,13 @@
 package eu.euporias.api.model;
 
-import java.util.Map;
+import java.util.Set;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -20,8 +21,8 @@ public class Product {
 	@NotBlank
 	private String name;
 	
-	@ElementCollection(targetClass=Parameter.class)
-	private Map<String, Parameter> parameters;
+	@OneToMany(cascade={CascadeType.ALL})
+	private Set<Parameter> parameters;
 
 	public Long getId() {
 		return id;
@@ -39,11 +40,11 @@ public class Product {
 		this.name = name;
 	}
 
-	public Map<String, Parameter> getParameters() {
+	public Set<Parameter> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, Parameter> parameters) {
+	public void setParameters(Set<Parameter> parameters) {
 		this.parameters = parameters;
 	}
 	

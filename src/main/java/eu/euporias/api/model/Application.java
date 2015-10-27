@@ -2,6 +2,7 @@ package eu.euporias.api.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ public class Application {
 	@Column(unique = true) 
 	private String name;
 	
-	@OneToMany
+	@OneToMany(cascade={CascadeType.ALL})
 	private Set<Product> products;
 	
 	public Long getId() {

@@ -1,4 +1,4 @@
-package eu.euporias.api.service;
+package eu.euporias.api.repository;
 
 import javax.validation.ValidationException;
 
