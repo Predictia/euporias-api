@@ -1,28 +1,30 @@
 package eu.euporias.api.model;
 
-import java.util.Map;
+import java.util.Set;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
-public class Product {
+public class Application {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
 	@NotBlank
+	@Column(unique = true) 
 	private String name;
 	
-	@ElementCollection(targetClass=Parameter.class)
-	private Map<String, Parameter> parameters;
-
+	@OneToMany
+	private Set<Product> products;
+	
 	public Long getId() {
 		return id;
 	}
@@ -30,7 +32,7 @@ public class Product {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -39,12 +41,12 @@ public class Product {
 		this.name = name;
 	}
 
-	public Map<String, Parameter> getParameters() {
-		return parameters;
+	public Set<Product> getProducts() {
+		return products;
 	}
 
-	public void setParameters(Map<String, Parameter> parameters) {
-		this.parameters = parameters;
+	public void setProducts(Set<Product> products) {
+		this.products = products;
 	}
 	
 }

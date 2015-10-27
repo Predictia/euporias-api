@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -29,8 +30,8 @@ public class User {
 	private String lastName;
 	private Date dateJoined;
 	
-	@ElementCollection(targetClass=String.class)
-	private Set<String> prototypes;
+	@ManyToMany
+	private Set<Application> applications;
 	
 	@ElementCollection(targetClass=java.lang.String.class)
 	private Map<String, String> attributes;
@@ -85,12 +86,12 @@ public class User {
 		this.dateJoined = dateJoined;
 	}
 
-	public Set<String> getPrototypes() {
-		return prototypes;
+	public Set<Application> getApplications() {
+		return applications;
 	}
 
-	public void setPrototypes(Set<String> prototypes) {
-		this.prototypes = prototypes;
+	public void setApplications(Set<Application> applications) {
+		this.applications = applications;
 	}
 
 	public Map<String, String> getAttributes() {

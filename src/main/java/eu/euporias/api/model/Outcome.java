@@ -1,5 +1,7 @@
 package eu.euporias.api.model;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
@@ -19,10 +21,22 @@ public class Outcome {
 	@ManyToOne
 	private Product product;
 	
+	@ManyToOne
+	private Application application;
+	
 	@ElementCollection(targetClass=String.class)
 	private Map<String, String> parameters;
 	
-	private Object[] results;
+	private OutcomeType outcomeType;
+	
+	private String format;
+	
+	private String mimeType;
+	
+	@ElementCollection
+	private List<String> results;
+	
+	private Date generatedDate;
 	
 	public Long getId() {
 		return id;
@@ -30,6 +44,14 @@ public class Outcome {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Application getApplication() {
+		return application;
+	}
+
+	public void setApplication(Application application) {
+		this.application = application;
 	}
 
 	public Product getProduct() {
@@ -48,12 +70,44 @@ public class Outcome {
 		this.parameters = parameters;
 	}
 
-	public Object[] getResults() {
+	public OutcomeType getOutcomeType() {
+		return outcomeType;
+	}
+
+	public void setOutcomeType(OutcomeType outcomeType) {
+		this.outcomeType = outcomeType;
+	}
+
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public List<String> getResults() {
 		return results;
 	}
 
-	public void setResults(Object[] results) {
+	public void setResults(List<String> results) {
 		this.results = results;
 	}
-	
+
+	public Date getGeneratedDate() {
+		return generatedDate;
+	}
+
+	public void setGeneratedDate(Date generatedDate) {
+		this.generatedDate = generatedDate;
+	}
+
 }
