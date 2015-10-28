@@ -9,11 +9,13 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.core.annotation.HandleAfterDelete;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
+import org.springframework.data.rest.core.annotation.HandleBeforeDelete;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 
@@ -22,6 +24,7 @@ import eu.euporias.api.model.OutcomeType;
 import eu.euporias.api.service.StorageService;
 
 @RepositoryEventHandler(Outcome.class)
+@Transactional
 public class OutcomeEventHandler {
 
 	@HandleBeforeCreate
@@ -47,7 +50,7 @@ public class OutcomeEventHandler {
 		outcome.setLastModifiedDate(new Date());
 	}
 	
-	@HandleAfterDelete
+	@HandleBeforeDelete
 	public void handleOutcomeDelete(Outcome outcome) {
 		if(FILE_TYPES.contains(outcome.getOutcomeType())){
 			outcome.getResults()
