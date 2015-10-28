@@ -2,6 +2,6 @@ package eu.euporias.api.model;
 
 public enum OutcomeType {
 
-	NUMBER, TEXT, FILE
+	NUMBER, TEXT, EMBEDDED_FILE, FILE
 	
 }

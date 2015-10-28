@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -39,6 +40,7 @@ public class Outcome {
 	private String mimeType;
 	
 	@ElementCollection
+	@OrderColumn
 	private List<String> results;
 	
 	@LastModifiedDate 

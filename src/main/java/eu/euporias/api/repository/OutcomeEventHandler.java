@@ -5,6 +5,8 @@ import static eu.euporias.api.util.Encoder.decodeBase64ToFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ public class OutcomeEventHandler {
 	@HandleBeforeCreate
 	public void handleOutcomeCreate(Outcome outcome) throws IOException {
 		outcome.setLastModifiedDate(new Date());
-		if(OutcomeType.FILE.equals(outcome.getOutcomeType())){
+		if(OutcomeType.EMBEDDED_FILE.equals(outcome.getOutcomeType())){
 			outcome.setResults(outcome.getResults().stream()
 				.map((base64text) -> {
 					try {
@@ -47,7 +49,7 @@ public class OutcomeEventHandler {
 	
 	@HandleAfterDelete
 	public void handleOutcomeDelete(Outcome outcome) {
-		if(OutcomeType.FILE.equals(outcome.getOutcomeType())){
+		if(FILE_TYPES.contains(outcome.getOutcomeType())){
 			outcome.getResults()
 				.forEach((relativePath) -> {
 					File f = storageService.expandFilePath(relativePath);
@@ -59,6 +61,7 @@ public class OutcomeEventHandler {
 	
 	@Autowired private StorageService storageService;
 	
+	private static final Set<OutcomeType> FILE_TYPES = EnumSet.of(OutcomeType.EMBEDDED_FILE, OutcomeType.FILE);	
 	private static final Logger LOGGER = LoggerFactory.getLogger(OutcomeEventHandler.class);
 
 }
