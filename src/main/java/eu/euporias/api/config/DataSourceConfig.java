@@ -4,6 +4,11 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DataSourceConnectionProvider;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultDSLContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +34,15 @@ public class DataSourceConfig {
 		return ds;
 	}
 
+	@Bean
+	public DSLContext dsl(DataSource dataSource) {
+		DataSourceConnectionProvider connectionProvider = new DataSourceConnectionProvider(dataSource);
+		DefaultConfiguration configuration = new DefaultConfiguration();
+		configuration.setConnectionProvider(connectionProvider);
+		configuration.setSQLDialect(SQLDialect.MYSQL);
+		return new DefaultDSLContext(configuration);
+	}
+	
 	private String getDataSourceUrl(){
 		return "jdbc:mysql://" + jdbcHost + ":" + jdbcPort +"/" + jdbcDatabase;
 	}
