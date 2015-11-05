@@ -28,7 +28,9 @@ import eu.euporias.api.repository.ProductRepository;
 @RepositoryRestController
 public class OutcomeController {
 
-    @RequestMapping(value = "/outcomes/search/applicationProductParameters", method = RequestMethod.GET)
+	public static final String REL = "parameters";
+	
+    @RequestMapping(value = "/outcomes/search/" + REL, method = RequestMethod.GET)
     @ResponseBody
     public PagedResources<PersistentEntityResource> customMethod(
     		@RequestParam(required=false) MultiValueMap<String, String> parameters, 
