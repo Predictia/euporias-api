@@ -12,6 +12,6 @@ import eu.euporias.api.model.Product;
 
 public interface OutcomeRepositoryCustom {
 
-	public Page<Outcome> findOutcomesByParameters(Application application, Product product, List<ParameterValue> parameters, Pageable page);
+	public Page<Outcome> findOutcomes(Application application, Product product, List<ParameterValue> parameters, Pageable page);
 	
 }

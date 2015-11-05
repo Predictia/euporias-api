@@ -25,7 +25,7 @@ import eu.euporias.api.model.Product;
 public class OutcomeRepositoryImpl implements OutcomeRepositoryCustom {
 
 	@Override
-	public Page<Outcome> findOutcomesByParameters(Application application, Product product, List<ParameterValue> parameters, Pageable page){
+	public Page<Outcome> findOutcomes(Application application, Product product, List<ParameterValue> parameters, Pageable page){
 		Table<Record> outcomeTable = table("outcome");
 		Table<Record> outcomeParametersTable = table("outcome_parameters");
 		Field<Long> outcomeIdField = field(Long.class, outcomeTable, "id");

@@ -41,7 +41,7 @@ public class OutcomeRepositoryTest {
 		List<ParameterValue> params = new ArrayList<>();
 		params.add(new ParameterValue("forecastStartTime", "2015102700Z"));
 		params.add(new ParameterValue("stationId", "00003544"));
-		Page<Outcome> page = outcomeRepository.findOutcomesByParameters(application, product, params, new PageRequest(0, 20));
+		Page<Outcome> page = outcomeRepository.findOutcomes(application, product, params, new PageRequest(0, 20));
 		Assert.assertFalse(page.getContent().isEmpty());
 	}
 	

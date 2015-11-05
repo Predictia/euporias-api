@@ -11,7 +11,6 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import eu.euporias.api.model.Application;
 import eu.euporias.api.model.Outcome;
-import eu.euporias.api.model.ParameterValue;
 import eu.euporias.api.model.Product;
 
 @RepositoryRestResource(excerptProjection = SimpleOutcomeProjection.class)
@@ -23,13 +22,6 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 		@Param("product") Product product, 
 		Pageable page
 	);
-	
-	@RestResource(path = "applicationProductParameters", rel = "applicationProductParameters")
-	public Page<Outcome> findOutcomesByParameters(
-		@Param("application") Application application, 
-		@Param("product") Product product,
-		@Param("parameters") List<ParameterValue> parameters,
-		Pageable page);
 	
 	@RestResource(exported=false)
 	public Page<Outcome> findByIdInOrderByLastModifiedDateDesc(List<Long> id, Pageable page);
