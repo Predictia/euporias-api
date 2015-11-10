@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import eu.euporias.api.model.Application;
@@ -48,7 +49,7 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 	void delete(Iterable<? extends Outcome> entities);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(returnObject.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PostAuthorize("#oauth2.clientHasRole(returnObject.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public Outcome findOne(Long aLong);
 	
 	@Override

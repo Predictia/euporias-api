@@ -33,22 +33,15 @@ public class OutcomeController {
 	
     @RequestMapping(value = "/outcomes/search/" + REL, method = RequestMethod.GET)
     @ResponseBody
-    public PagedResources<PersistentEntityResource> customMethod(
+    public PagedResources<PersistentEntityResource> findOutcomes(
     		@RequestParam(required=false) MultiValueMap<String, String> parameters, 
     		@RequestParam(required=false) Pageable pageable
     	) {
     	Page<Outcome> outcomePage = NO_OUTCOMES_PAGE;
     	if ((parameters != null) && parameters.containsKey(APPLICATION_PARAMETER_KEY) && parameters.containsKey(PRODUCT_PARAMETER_KEY)){
-    		Application application = applicationRepository.findOne(Long.valueOf(parameters.getFirst(APPLICATION_PARAMETER_KEY)));
+    		Application application = application(parameters);
     		Product product = product(application, parameters);
-    		List<ParameterValue> pvs = new ArrayList<>();
-        	for(String key : parameters.keySet()){
-        		if(APPLICATION_PARAMETER_KEY.equalsIgnoreCase(key)) continue;
-        		if(PRODUCT_PARAMETER_KEY.equalsIgnoreCase(key)) continue;
-        		for(String value : parameters.get(key)){
-        			pvs.add(new ParameterValue(key, value));
-        		}
-        	}
+    		List<ParameterValue> pvs = parameterValues(parameters);
         	if(pvs.isEmpty()){
         		outcomePage = outcomeRepository.findByApplicationAndProductOrderByLastModifiedDateDesc(application, product, pageable);
         	}else{
@@ -58,10 +51,12 @@ public class OutcomeController {
         return pagedResourcesAssembler.toResource(outcomePage);
     }
     
+    private Application application(MultiValueMap<String, String> parameters){
+    	Long appId = Long.valueOf(parameters.getFirst(APPLICATION_PARAMETER_KEY));
+    	return applicationRepository.findOne(appId);
+    }
+    
     private Product product(Application application, MultiValueMap<String, String> parameters){
-    	if(!parameters.containsKey(PRODUCT_PARAMETER_KEY)){
-    		throw new IllegalArgumentException("No product requested");
-    	}
     	try{
     		Long productId = Long.valueOf(parameters.getFirst(PRODUCT_PARAMETER_KEY));
     		return productRepository.findOne(productId);
@@ -72,6 +67,18 @@ public class OutcomeController {
 				.findFirst();
 			return eProduct.get();
     	} 
+    }
+    
+    private List<ParameterValue> parameterValues(MultiValueMap<String, String> parameters){
+    	List<ParameterValue> pvs = new ArrayList<>();
+    	for(String key : parameters.keySet()){
+    		if(APPLICATION_PARAMETER_KEY.equalsIgnoreCase(key)) continue;
+    		if(PRODUCT_PARAMETER_KEY.equalsIgnoreCase(key)) continue;
+    		for(String value : parameters.get(key)){
+    			pvs.add(new ParameterValue(key, value));
+    		}
+    	}
+    	return pvs;
     }
     
     private static final Page<Outcome> NO_OUTCOMES_PAGE = new PageImpl<>(new ArrayList<>());

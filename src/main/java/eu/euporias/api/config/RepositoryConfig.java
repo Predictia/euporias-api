@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import eu.euporias.api.repository.ApplicationEventHandler;
+import eu.euporias.api.repository.FeedbackEventHandler;
 import eu.euporias.api.repository.OutcomeEventHandler;
 
 @Configuration
@@ -17,6 +18,11 @@ public class RepositoryConfig {
 	@Bean
 	OutcomeEventHandler outcomeEventHandler() {
 		return new OutcomeEventHandler();
+	}
+	
+	@Bean
+	FeedbackEventHandler feedbackEventHandler() {
+		return new FeedbackEventHandler();
 	}
 
 }
