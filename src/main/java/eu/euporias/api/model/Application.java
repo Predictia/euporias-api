@@ -38,7 +38,7 @@ public class Application implements GrantedAuthority {
 	
 	private String secret;
 	
-	@OneToMany(cascade={CascadeType.ALL})
+	@OneToMany(cascade={CascadeType.ALL}, orphanRemoval = true)
 	private Set<Product> products;
 	
 	public Long getId() {

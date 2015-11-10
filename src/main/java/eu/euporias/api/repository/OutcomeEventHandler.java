@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,7 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 
 import eu.euporias.api.model.Outcome;
 import eu.euporias.api.model.OutcomeType;
+import eu.euporias.api.model.Product;
 import eu.euporias.api.service.StorageService;
 
 @RepositoryEventHandler(Outcome.class)
@@ -29,6 +31,7 @@ public class OutcomeEventHandler {
 
 	@HandleBeforeCreate
 	public void handleOutcomeCreate(Outcome outcome) throws IOException {
+		assignExistingProduct(outcome);
 		outcome.setLastModifiedDate(new Date());
 		if(OutcomeType.EMBEDDED_FILE.equals(outcome.getOutcomeType())){
 			outcome.setResults(outcome.getResults().stream()
@@ -43,6 +46,22 @@ public class OutcomeEventHandler {
 				.collect(Collectors.toList())
 			);
 		}
+	}
+	
+	private void assignExistingProduct(Outcome outcome){
+		if(outcome.getProduct().getId() != null){
+			return;
+		}
+		String productName = outcome.getProduct() != null ? 
+			outcome.getProduct().getName() : 
+			null;
+		Optional<Product> eProduct = outcome.getApplication().getProducts().stream()
+			.filter(p -> p.getName().equals(productName))
+			.findFirst();
+		if(!eProduct.isPresent()){
+			throw new IllegalArgumentException("Product with name " + productName + " not found");
+		}
+		outcome.setProduct(eProduct.get());
 	}
 	
 	@HandleBeforeSave
