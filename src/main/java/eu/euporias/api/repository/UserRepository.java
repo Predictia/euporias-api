@@ -22,4 +22,24 @@ public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
 	public User findOne(Long aLong);
 	
+	@Override
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void deleteAll();
+
+	@Override
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void delete(Iterable<? extends User> entities);
+	
+	@Override
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void delete(User id);
+
+	@Override
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public <T extends User> T save(T entity);
+
+	@Override
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public <T extends User> Iterable<T> save(Iterable<T> entities);
+	
 }
