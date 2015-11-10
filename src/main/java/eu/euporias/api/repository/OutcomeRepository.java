@@ -19,7 +19,7 @@ import eu.euporias.api.model.Product;
 @RepositoryRestResource(excerptProjection = SimpleOutcomeProjection.class)
 public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, Long>, OutcomeRepositoryCustom {
 
-	@RestResource(path = "applicationProduct", rel = "applicationProduct")
+	@RestResource(exported = false)
 	@PreAuthorize("#oauth2.clientHasRole(#application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public Page<Outcome> findByApplicationAndProductOrderByLastModifiedDateDesc(
 		@Param("application") Application application, 
@@ -48,7 +48,7 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 	void delete(Iterable<? extends Outcome> entities);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("#oauth2.clientHasRole(returnObject.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public Outcome findOne(Long aLong);
 	
 	@Override

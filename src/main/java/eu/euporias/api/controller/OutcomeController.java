@@ -2,6 +2,7 @@ package eu.euporias.api.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,7 @@ public class OutcomeController {
     	Page<Outcome> outcomePage = NO_OUTCOMES_PAGE;
     	if ((parameters != null) && parameters.containsKey(APPLICATION_PARAMETER_KEY) && parameters.containsKey(PRODUCT_PARAMETER_KEY)){
     		Application application = applicationRepository.findOne(Long.valueOf(parameters.getFirst(APPLICATION_PARAMETER_KEY)));
-    		Product product = productRepository.findOne(Long.valueOf(parameters.getFirst(PRODUCT_PARAMETER_KEY)));
+    		Product product = product(application, parameters);
     		List<ParameterValue> pvs = new ArrayList<>();
         	for(String key : parameters.keySet()){
         		if(APPLICATION_PARAMETER_KEY.equalsIgnoreCase(key)) continue;
@@ -55,6 +56,22 @@ public class OutcomeController {
         	}
     	}    	
         return pagedResourcesAssembler.toResource(outcomePage);
+    }
+    
+    private Product product(Application application, MultiValueMap<String, String> parameters){
+    	if(!parameters.containsKey(PRODUCT_PARAMETER_KEY)){
+    		throw new IllegalArgumentException("No product requested");
+    	}
+    	try{
+    		Long productId = Long.valueOf(parameters.getFirst(PRODUCT_PARAMETER_KEY));
+    		return productRepository.findOne(productId);
+    	}catch(NumberFormatException e){
+    		String productName = parameters.getFirst(PRODUCT_PARAMETER_KEY);
+    		Optional<Product> eProduct = application.getProducts().stream()
+				.filter(p -> p.getName().equals(productName))
+				.findFirst();
+			return eProduct.get();
+    	} 
     }
     
     private static final Page<Outcome> NO_OUTCOMES_PAGE = new PageImpl<>(new ArrayList<>());
