@@ -119,5 +119,10 @@ public class Feedback {
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
+
+	@Override
+	public String toString() {
+		return "Feedback [id=" + id + "]";
+	}
 	
 }

@@ -51,5 +51,10 @@ public class ParameterValue {
 		} else if (!value.equals(other.value)) return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "ParameterValue [name=" + name + ", value=" + value + "]";
+	}
 	
 }

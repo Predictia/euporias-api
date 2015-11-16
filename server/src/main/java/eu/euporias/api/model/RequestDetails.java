@@ -69,5 +69,10 @@ public class RequestDetails implements Serializable {
 	public void setoAuth2Scope(String oAuth2Scope) {
 		this.oAuth2Scope = oAuth2Scope;
 	}
+
+	@Override
+	public String toString() {
+		return "RequestDetails [id=" + id + "]";
+	}
 	
 }

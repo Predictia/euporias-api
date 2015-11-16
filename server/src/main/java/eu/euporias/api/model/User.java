@@ -182,4 +182,9 @@ public class User implements UserDetails {
 		return !Boolean.TRUE.equals(disabled);
 	}
 
+	@Override
+	public String toString() {
+		return "User [id=" + id + "]";
+	}
+
 }

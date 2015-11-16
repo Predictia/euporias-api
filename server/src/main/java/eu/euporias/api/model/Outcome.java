@@ -118,4 +118,9 @@ public class Outcome {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
+	@Override
+	public String toString() {
+		return "Outcome [id=" + id + "]";
+	}
+
 }

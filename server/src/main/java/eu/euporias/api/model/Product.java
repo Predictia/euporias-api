@@ -47,5 +47,10 @@ public class Product {
 	public void setParameters(Set<Parameter> parameters) {
 		this.parameters = parameters;
 	}
+
+	@Override
+	public String toString() {
+		return "Product [id=" + id + "]";
+	}
 	
 }
