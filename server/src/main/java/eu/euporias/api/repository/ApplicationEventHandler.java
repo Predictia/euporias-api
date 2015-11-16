@@ -15,7 +15,8 @@ public class ApplicationEventHandler {
 
 	@HandleBeforeCreate
 	public void handleApplicationCreate(Application application){
-		application.setSecret(UUID.randomUUID().toString());	
+		application.setSecret(UUID.randomUUID().toString());
+		application.setReadOnlySecret(UUID.randomUUID().toString());
 	}
 
 }

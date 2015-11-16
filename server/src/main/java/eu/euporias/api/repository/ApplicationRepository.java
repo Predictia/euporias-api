@@ -42,7 +42,7 @@ public interface ApplicationRepository extends PagingAndSortingRepository<Applic
 	public void delete(Application id);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(#application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("(#oauth2.clientHasRole(#application.authority) and #oauth2.hasScope('write')) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public <T extends Application> T save(@P("application")  T entity);
 
 	@Override

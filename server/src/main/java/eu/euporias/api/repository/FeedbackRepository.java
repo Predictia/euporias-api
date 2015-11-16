@@ -43,11 +43,11 @@ public interface FeedbackRepository extends PagingAndSortingRepository<Feedback,
 	public Feedback findOne(Long aLong);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(#feedback.outcome.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("(#oauth2.clientHasRole(#feedback.outcome.application.authority) and #oauth2.hasScope('write')) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public <S extends Feedback> S save(@P("feedback") S feedback);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(#feedback.outcome.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("(#oauth2.clientHasRole(#feedback.outcome.application.authority) and #oauth2.hasScope('write')) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public void delete(@P("feedback") Feedback feedback);
 	
 }

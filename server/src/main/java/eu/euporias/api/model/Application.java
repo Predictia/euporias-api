@@ -36,7 +36,7 @@ public class Application implements GrantedAuthority {
 	@Column(unique = true) 
 	private String name;
 	
-	private String secret;
+	private String secret, readOnlySecret;
 	
 	@OneToMany(cascade={CascadeType.ALL}, orphanRemoval = true)
 	private Set<Product> products;
@@ -59,6 +59,14 @@ public class Application implements GrantedAuthority {
 
 	public String getSecret() {
 		return secret;
+	}
+
+	public String getReadOnlySecret() {
+		return readOnlySecret;
+	}
+
+	public void setReadOnlySecret(String readOnlySecret) {
+		this.readOnlySecret = readOnlySecret;
 	}
 
 	public void setSecret(String secret) {

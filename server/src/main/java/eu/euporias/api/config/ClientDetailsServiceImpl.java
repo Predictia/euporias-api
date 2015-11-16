@@ -22,6 +22,17 @@ import eu.euporias.api.repository.ApplicationRepository;
 import eu.euporias.api.repository.RoleRepository;
 import eu.euporias.api.repository.UserRepository;
 
+/**
+ * Creates {@link ClientDetails} from {@link User} objets and
+ * {@link Application} objects. User objects are fetched using email as the
+ * clientId field. They always have read/write scopes. Applications are mapped
+ * using application name, or application name ending with
+ * {@link ClientDetailsServiceImpl#READ_ONLY_SUFFIX} in case of read only
+ * clients.
+ * 
+ * @author Max Tuni
+ *
+ */
 @Service("clientDetailsService")
 @Transactional
 public class ClientDetailsServiceImpl implements ClientDetailsService, InitializingBean {
@@ -40,19 +51,28 @@ public class ClientDetailsServiceImpl implements ClientDetailsService, Initializ
 		}
 	}
 	
+	public static final String READ_ONLY_SUFFIX = ".ro";
+	
 	private ClientDetails findApplicationClient(String clientId){
-		Application application = applicationRepository.findByName(clientId);
+		boolean roClient = clientId.endsWith(READ_ONLY_SUFFIX);
+		String applicationName = roClient ?
+			clientId.substring(0, clientId.lastIndexOf(READ_ONLY_SUFFIX)) :
+			clientId;
+		Application application = applicationRepository.findByName(applicationName);
 		if(application == null){
 			throw new ClientRegistrationException("Unable to find client with id " + clientId);
 		}
 		BaseClientDetails clientDetails = new BaseClientDetails(
 			clientId, 
 			ResourceServerConfig.RESOURCE_ID, 
-			"read,write", 
+			roClient ? "read" : "read,write", 
 			"client_credentials", 
 			application.getAuthority()
 		);
-		clientDetails.setClientSecret(application.getSecret());
+		clientDetails.setClientSecret(roClient ? 
+			application.getReadOnlySecret() : 
+			application.getSecret()
+		);
 		return clientDetails;
 	}
 

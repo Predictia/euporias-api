@@ -53,11 +53,11 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 	public Outcome findOne(Long aLong);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(#outcome.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("(#oauth2.clientHasRole(#outcome.application.authority) and #oauth2.hasScope('write')) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public <S extends Outcome> S save(@P("outcome") S outcome);
 	
 	@Override
-	@PreAuthorize("#oauth2.clientHasRole(#outcome.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
+	@PreAuthorize("(#oauth2.clientHasRole(#outcome.application.authority) and #oauth2.hasScope('write')) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public void delete(@P("outcome") Outcome outcome);
 	
 	@RestResource(exported=false)
