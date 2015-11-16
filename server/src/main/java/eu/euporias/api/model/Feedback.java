@@ -2,15 +2,23 @@ package eu.euporias.api.model;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Feedback {
 	
 	@Id
@@ -20,8 +28,19 @@ public class Feedback {
 	@ManyToOne(optional = false)
 	private Outcome outcome;
 
+	@CreatedDate
+	private Date created = new Date();
+	
 	@LastModifiedDate 
 	private Date lastModifiedDate;
+	
+	@CreatedBy
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval = true)
+	private RequestDetails createdBy;
+
+	@LastModifiedBy
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval = true)
+	private RequestDetails updatedBy;
 	
 	private Double score;
 	
