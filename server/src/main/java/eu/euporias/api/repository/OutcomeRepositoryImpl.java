@@ -1,5 +1,8 @@
 package eu.euporias.api.repository;
 
+import static eu.euporias.api.util.DSLNames.field;
+import static eu.euporias.api.util.DSLNames.table;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,18 +59,6 @@ public class OutcomeRepositoryImpl implements OutcomeRepositoryCustom {
 		return outcomeRepository
 			.findByIdInOrderByLastModifiedDateDesc(selectQuery.fetch(outcomeIdField), page);
 		
-	}
-	
-	private static Table<Record> table(String name){
-		return DSL.table(DSL.name(name));
-	}
-	
-	private static <T> Field<T> field(Class<T> clazz, Table<Record> table, String column){
-		return DSL.field(DSL.name(table.getName(), column), clazz);
-	}
-	
-	private static Field<Object> field(Table<Record> table, String column){
-		return DSL.field(DSL.name(table.getName(), column));
 	}
 	
 	@Autowired private OutcomeRepository outcomeRepository;
