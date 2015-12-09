@@ -23,6 +23,7 @@ import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 
+import eu.euporias.api.model.Application;
 import eu.euporias.api.model.Outcome;
 import eu.euporias.api.model.OutcomeType;
 import eu.euporias.api.model.ParameterValue;
@@ -61,7 +62,8 @@ public class OutcomeEventHandler {
 		String productName = outcome.getProduct() != null ? 
 			outcome.getProduct().getName() : 
 			null;
-		Optional<Product> eProduct = outcome.getApplication().getProducts().stream()
+		Application app = applicationRepository.findOne(outcome.getApplication().getId());
+		Optional<Product> eProduct = app.getProducts().stream()
 			.filter(p -> p.getName().equals(productName))
 			.findFirst();
 		if(!eProduct.isPresent()){
@@ -101,6 +103,7 @@ public class OutcomeEventHandler {
 	}
 	
 	@Autowired private OutcomeRepository outcomeRepository;
+	@Autowired private ApplicationRepository applicationRepository;
 	@Autowired private StorageService storageService;
 	
 	private static final Set<OutcomeType> FILE_TYPES = EnumSet.of(OutcomeType.EMBEDDED_FILE, OutcomeType.FILE);	

@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -70,16 +72,24 @@ public class AutitConfig {
 		return  new MethodInterceptor() {
 			@Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
-				OutcomeAccess outcomeAccess = new OutcomeAccess();
-				outcomeAccess.setMethodName(invocation.getMethod().getName());
-				Parameter[] params = invocation.getMethod().getParameters();
-				if(params != null){
-					outcomeAccess.setArguments(StringUtils.arrayToCommaDelimitedString(invocation.getArguments()));
+				try{
+					outcomeAccessRepository.save(createOutcomeAccess(invocation));
+				}catch(Throwable t){
+					LOGGER.warn("Unable to register outcome query: {}", t.getMessage());
 				}
-				outcomeAccessRepository.save(outcomeAccess);
 				return invocation.proceed();
 			}
 		};
+	}
+	
+	private static OutcomeAccess createOutcomeAccess(MethodInvocation invocation){
+		OutcomeAccess outcomeAccess = new OutcomeAccess();
+		outcomeAccess.setMethodName(invocation.getMethod().getName());
+		Parameter[] params = invocation.getMethod().getParameters();
+		if(params != null){
+			outcomeAccess.setArguments(StringUtils.arrayToCommaDelimitedString(invocation.getArguments()));
+		}
+		return outcomeAccess;
 	}
 
 	@Bean
@@ -91,5 +101,6 @@ public class AutitConfig {
     
     private static final Joiner COMMA_JOINER = Joiner.on(",").skipNulls();
     private static final MapJoiner MAP_JOINER = Joiner.on(";").useForNull("").withKeyValueSeparator("=");
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutitConfig.class);
 	
 }
