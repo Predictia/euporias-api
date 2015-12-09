@@ -16,12 +16,14 @@ import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeDelete;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.stereotype.Component;
 
 import eu.euporias.api.model.Feedback;
 import eu.euporias.api.service.StorageService;
 
 @RepositoryEventHandler(Feedback.class)
 @Transactional
+@Component
 public class FeedbackEventHandler {
 
 	@HandleBeforeCreate
