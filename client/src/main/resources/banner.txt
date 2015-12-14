@@ -1,0 +1,6 @@
+${AnsiBackground.BLUE}${AnsiColor.WHITE}
+ __     __  __  __       __       __       __     __    ___ 
+|_ /  \|__)/  \|__)| /\ (_    /\ |__)| __ /  |  ||_ |\ | |  
+|__\__/|   \__/| \ |/--\__)  /--\|   |    \__|__||__| \| |  
+Version ${application.version}
+${AnsiBackground.DEFAULT}${AnsiColor.DEFAULT}
