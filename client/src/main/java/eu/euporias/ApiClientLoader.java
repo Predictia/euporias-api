@@ -22,6 +22,8 @@ public class ApiClientLoader implements CommandLineRunner {
 	@Value("${tokenUrl}") private String tokenUrl;
 	@Value("${testTokenUrl}") private String testTokenUrl;
 	@Value("${scope}") private String scope;
+	@Value("${proxyUrl}") private String proxyUrl;
+	@Value("${proxyPort}") private Integer proxyPort;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -50,6 +52,8 @@ public class ApiClientLoader implements CommandLineRunner {
 		config.put("apiUrl",apiUrl);
 		config.put("tokenUrl",tokenUrl);
 		config.put("testTokenUrl",testTokenUrl);
+		if(proxyPort!=null)	config.put("proxyPort",proxyPort.toString());
+		config.put("proxyUrl",proxyUrl);
 		return config;
 	}	
 

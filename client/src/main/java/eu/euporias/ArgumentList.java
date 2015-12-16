@@ -24,7 +24,8 @@ public class ArgumentList {
 		mimeType, results(ArgumentType.file), param,
         stationLon, stationLat, stationName,
         forecastStartTime, stationId,
-        secret(false),user(false);
+        secret(false),user(false),
+        proxyUrl(false),proxyPort(false);
 
 		private final ArgumentType argumentTye;
 		private final Boolean toBeSent;		

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.fge.jackson.JsonLoader;
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 import eu.euporias.ArgumentList.Argument;
@@ -33,10 +35,29 @@ public class RequestGenerator {
 	
 	private static final String TOKEN_FILE = "euporias-api-token.txt";
 	private static final String JSON_DEFINITION = "application/json";
+	private static final String PROXY_URL = "proxyUrl";
+	private static final String PROXY_PORT = "proxyPort";
 	private final Map<String,String> config;
+	private HttpHost proxy = null;
 	
 	RequestGenerator(Map<String,String> config){
 		this.config = config;
+		if(config.containsKey(PROXY_URL) && config.containsKey(PROXY_PORT)){
+			String proxyUrl = config.get(PROXY_URL);
+			if(!Strings.isNullOrEmpty(proxyUrl)){
+				Integer proxyPort = Integer.parseInt(config.get(PROXY_PORT));
+				proxy = new HttpHost(proxyUrl,proxyPort);
+			}
+		}
+	}
+	
+	private HttpClient httpClient(){
+		if(proxy != null){
+			return HttpClientBuilder.create()
+					.setProxy(proxy)
+					.build();
+		}
+		return HttpClientBuilder.create().build();
 	}
 	
 	protected String token(ArgumentList parameters) throws IOException{
@@ -58,7 +79,6 @@ public class RequestGenerator {
 	}
 	
 	protected String get(String action,String token,ArgumentList parameters) throws UnsupportedOperationException, IOException{
-		HttpClient client = HttpClientBuilder.create().build();
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		for(Map.Entry<Argument,String> param : parameters.get()){
 			params.add(new BasicNameValuePair(param.getKey().name(),param.getValue()));
@@ -66,18 +86,17 @@ public class RequestGenerator {
 		HttpGet get = new HttpGet(config.get("apiUrl")+ action+"?"+URLEncodedUtils.format(params, "UTF-8"));
 		get.setHeader("Authorization", "Bearer "+token);
 		get.setHeader("Content-Type", JSON_DEFINITION);		
-		HttpResponse response = client.execute(get);
+		HttpResponse response = httpClient().execute(get);
 		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
 	protected String post(String action,String token,ArgumentList parameters,ArgumentList extraParameters) throws UnsupportedOperationException, IOException{
-		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(config.get("apiUrl") + action);
 		StringEntity postString = new StringEntity(jsonPost(parameters,extraParameters));
 		post.setEntity(postString);
 		post.setHeader("Authorization", "Bearer "+token);
 		post.setHeader("Content-type", JSON_DEFINITION);
-		HttpResponse response = client.execute(post);
+		HttpResponse response = httpClient().execute(post);
 		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
@@ -108,7 +127,6 @@ public class RequestGenerator {
 	
 	private String newToken(ArgumentList parameters) throws IOException{
 		logger.info("Requesting a new token");
-		HttpClient client = HttpClientBuilder.create().build();
 
 		HttpPost post = new HttpPost(config.get("apiUrl") + config.get("tokenUrl"));
 		String authorization = BasicAuthHelper.createHeader(parameters.get(Argument.user),parameters.get(Argument.secret));
@@ -119,7 +137,7 @@ public class RequestGenerator {
 		params.add(new BasicNameValuePair("scope", config.get("scope")));
 		post.setEntity(new UrlEncodedFormEntity(params));
 
-		HttpResponse response = client.execute(post);
+		HttpResponse response = httpClient().execute(post);
 		String result = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 
 		return JsonLoader.fromString(result).get("access_token").textValue();
