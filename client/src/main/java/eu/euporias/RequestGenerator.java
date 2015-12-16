@@ -2,7 +2,6 @@ package eu.euporias;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +63,11 @@ public class RequestGenerator {
 		for(Map.Entry<Argument,String> param : parameters.get()){
 			params.add(new BasicNameValuePair(param.getKey().name(),param.getValue()));
 		}		
-		HttpGet get = new HttpGet(config.get("apiUrl")+ action+"?"+URLEncodedUtils.format(params, StandardCharsets.UTF_8.name()));
+		HttpGet get = new HttpGet(config.get("apiUrl")+ action+"?"+URLEncodedUtils.format(params, "UTF-8"));
 		get.setHeader("Authorization", "Bearer "+token);
 		get.setHeader("Content-Type", JSON_DEFINITION);		
 		HttpResponse response = client.execute(get);
-		return IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8.name());
+		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
 	protected String post(String action,String token,ArgumentList parameters,ArgumentList extraParameters) throws UnsupportedOperationException, IOException{
@@ -79,7 +78,7 @@ public class RequestGenerator {
 		post.setHeader("Authorization", "Bearer "+token);
 		post.setHeader("Content-type", JSON_DEFINITION);
 		HttpResponse response = client.execute(post);
-		return IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8.name());
+		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
 	private String jsonPost(ArgumentList parameters,ArgumentList extraParameters){
@@ -121,7 +120,7 @@ public class RequestGenerator {
 		post.setEntity(new UrlEncodedFormEntity(params));
 
 		HttpResponse response = client.execute(post);
-		String result = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+		String result = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 
 		return JsonLoader.fromString(result).get("access_token").textValue();
 	}
