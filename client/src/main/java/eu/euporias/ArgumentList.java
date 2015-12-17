@@ -25,7 +25,7 @@ public class ArgumentList {
         stationLon, stationLat, stationName,
         forecastStartTime, stationId,
         secret(false),user(false),
-        proxyUrl(false),proxyPort(false);
+        proxyUrl(false),proxyPort(false),parameter, id;
 
 		private final ArgumentType argumentTye;
 		private final Boolean toBeSent;		

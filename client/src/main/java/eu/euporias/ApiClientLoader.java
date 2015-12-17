@@ -38,6 +38,12 @@ public class ApiClientLoader implements CommandLineRunner {
 		if("search".equals(action)){
 			String result = request.get("outcomes/search/parameters",token,arguments);
 			logger.warn(result);
+		}else if("delete".equals(action)){
+			String result = request.delete("outcomes/",token,arguments);
+			logger.warn(result);
+		}else if("metadata".equals(action)){
+			String result = request.get("outcomes/search/metadata",token,arguments);
+			logger.warn(result);
 		}else if("post".equals(action)){
 			ArgumentList extraParameters = ParamUtils.parameters(args,ParamUtils.PARAMETER_PREDICATE);
 			String result = request.post("outcomes/",token,arguments,extraParameters);

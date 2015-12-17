@@ -24,7 +24,7 @@ public class ParamUtils {
 	protected final static Predicate<String> PARAMETER_PREDICATE = new Predicate<String>(){
 		@Override
 		public boolean apply(String input) {
-			return input.startsWith(ARGUMENT_PREFIX+Argument.param.name());
+			return input.startsWith(ARGUMENT_PREFIX+Argument.param.name()+ARGUMENT_DELIMITER);
 		}		
 	};
 	

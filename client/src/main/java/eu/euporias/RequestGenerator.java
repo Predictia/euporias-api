@@ -13,6 +13,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -76,6 +77,20 @@ public class RequestGenerator {
 			Files.write(token, tokenFile, Charsets.UTF_8);
 		}
 		return token;
+	}
+	
+	protected String delete(String action,String token,ArgumentList parameters) throws UnsupportedOperationException, IOException{
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		for(Map.Entry<Argument,String> param : parameters.get()){
+			params.add(new BasicNameValuePair(param.getKey().name(),param.getValue()));
+		}
+		String id = parameters.get(Argument.id);
+		id = id!=null?("/"+id):"";
+		HttpDelete delete = new HttpDelete(config.get("apiUrl")+ action + id +"?"+URLEncodedUtils.format(params, "UTF-8"));
+		delete.setHeader("Authorization", "Bearer "+token);
+		delete.setHeader("Content-Type", JSON_DEFINITION);		
+		HttpResponse response = httpClient().execute(delete);
+		return response.getStatusLine().toString();
 	}
 	
 	protected String get(String action,String token,ArgumentList parameters) throws UnsupportedOperationException, IOException{
