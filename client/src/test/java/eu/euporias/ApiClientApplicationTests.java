@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ApiClientApplicationTests {
 
 	@Test
-	@Ignore
+	@Ignore("needs arguments")
 	public void contextLoads() {
 	}
 

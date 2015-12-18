@@ -2,13 +2,20 @@ package eu.euporias;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -67,7 +74,7 @@ public class ArgumentList {
 		return Maps.filterKeys(arguments,SENDABLE_PREDICATE).entrySet();
 	}
 	
-	public String get(Argument argument){
+	public String get(Argument argument) throws IOException {
 		if(!arguments.containsKey(argument)){
 			throw new IllegalArgumentException("Missing argument "+argument);
 		}
@@ -84,17 +91,41 @@ public class ArgumentList {
 		return arguments.get(argument);
 	}
 	
-	private static String base64(String file){
-		try{
-			FileInputStream fileInputStreamReader = new FileInputStream(new File(file));
-			byte[] bytes = new byte[(int)file.length()];
-			fileInputStreamReader.read(bytes);
-			fileInputStreamReader.close();
-			return new String(Base64.encodeBase64(bytes));
-		}catch(FileNotFoundException e){
-			throw new IllegalArgumentException("File not found "+file);
-		}catch(IOException e){
-			throw new IllegalArgumentException("Problem reading file "+file);
+	private static String base64(String urlStr) throws IOException {
+		File file = new File(urlStr);
+		if(file.exists()){
+			return base64File(file.getAbsolutePath());
+		}else{
+			URL url = new URL(urlStr);
+			File tmpFile = File.createTempFile("download-", "." + FilenameUtils.getExtension(urlStr));
+			tmpFile.delete();
+			tmpFile.deleteOnExit();
+			downloadToFile(url, tmpFile);
+			return base64File(tmpFile.getAbsolutePath());
 		}
 	}
+	
+	private static String base64File(String file) throws IOException {
+		FileInputStream fis = new FileInputStream(new File(file));
+		try{
+			byte[] content = IOUtils.toByteArray(fis);
+			return new String(Base64.encodeBase64(content));
+		}finally{
+			fis.close();
+		}
+	}
+	
+	private static void downloadToFile(URL source, File file) throws IOException{
+		LOGGER.info("Downloading from " + source + " to file: " + file);
+		ReadableByteChannel rbc = Channels.newChannel(source.openStream());
+		FileOutputStream fos = new FileOutputStream(file);
+		try{
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		}finally{
+			fos.close();
+		}		
+	}
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentList.class);
+	
 }
