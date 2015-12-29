@@ -35,7 +35,7 @@ public class ParamUtils {
 				List<String> param = Lists.newArrayList(ARGUMENT_SPLITTER.split(arg));
 				if(param.size()==2){
 					String argKey = param.get(0);
-					String argValue = param.get(1);
+					String argValue = trim(param.get(1));
 					if((ARGUMENT_PREFIX+Argument.param.name()).equals(argKey)){
 						List<String> value = Lists.newArrayList(PARAM_SPLITTER.split(argValue));
 						if(value.size()==2){
@@ -62,5 +62,14 @@ public class ParamUtils {
 			}
 		}
 		return params;
+	}
+	
+	private static String trim(String input){
+		if(input == null) return "";
+		String result = input.trim();
+		if (result.startsWith("\"") && result.endsWith("\"") && result.length() > 1){
+			result = result.substring(1,result.length()-1);
+		}
+		return result;
 	}
 }

@@ -154,7 +154,6 @@ public class RequestGenerator {
 
 		HttpResponse response = httpClient().execute(post);
 		String result = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
-
 		return JsonLoader.fromString(result).get("access_token").textValue();
 	}
 }
