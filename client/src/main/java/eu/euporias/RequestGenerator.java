@@ -3,6 +3,7 @@ package eu.euporias;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -107,7 +108,8 @@ public class RequestGenerator {
 	
 	protected String post(String action,String token,ArgumentList parameters,ArgumentList extraParameters) throws UnsupportedOperationException, IOException{
 		HttpPost post = new HttpPost(config.get("apiUrl") + action);
-		StringEntity postString = new StringEntity(jsonPost(parameters,extraParameters));
+		String json = jsonPost(parameters,extraParameters);
+		StringEntity postString = new StringEntity(json);
 		post.setEntity(postString);
 		post.setHeader("Authorization", "Bearer "+token);
 		post.setHeader("Content-type", JSON_DEFINITION);
@@ -115,7 +117,7 @@ public class RequestGenerator {
 		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
-	private String jsonPost(ArgumentList parameters,ArgumentList extraParameters){
+	private String jsonPost(ArgumentList parameters,ArgumentList extraParameters) throws IOException{
 		StringBuilder builder = new StringBuilder();
 		builder.append("{");
 		builder.append("\"application\":\""+config.get("apiUrl")+"applications/"+parameters.get(Argument.application)+"\",\n");

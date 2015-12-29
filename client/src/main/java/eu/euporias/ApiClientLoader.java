@@ -1,5 +1,6 @@
 package eu.euporias;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class ApiClientLoader implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-
+		logger.info("Running API client with arguments: {}", Arrays.deepToString(args));
 		ArgumentList arguments = ParamUtils.parameters(args,Predicates.not(ParamUtils.PARAMETER_PREDICATE));
 		String action = arguments.get(Argument.action);
 		RequestGenerator request = new RequestGenerator(config());
