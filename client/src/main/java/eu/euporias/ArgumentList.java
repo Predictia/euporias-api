@@ -29,7 +29,7 @@ public class ArgumentList {
 	protected static enum Argument{
 		action(false), product, application, outcomeType, 
 		mimeType, results(ArgumentType.file), param,
-        stationLon, stationLat, stationName,
+        stationLon, stationLat, stationName, variable,
         forecastStartTime, stationId,
         secret(false),user(false),
         proxyUrl(false),proxyPort(false),parameter, id;
