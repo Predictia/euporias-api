@@ -30,7 +30,7 @@ public class ArgumentList {
 		action(false), product, application, outcomeType, 
 		mimeType, results(ArgumentType.file), param,
         stationLon, stationLat, stationName, variable,
-        forecastStartTime, stationId,
+        forecastStartTime, stationId, type, season, county, year,
         secret(false),user(false),
         proxyUrl(false),proxyPort(false),parameter, id;
 
