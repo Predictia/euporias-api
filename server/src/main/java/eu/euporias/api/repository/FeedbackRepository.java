@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import eu.euporias.api.model.Feedback;
 import eu.euporias.api.model.Outcome;
 
+@RepositoryRestResource(exported=false)
 public interface FeedbackRepository extends PagingAndSortingRepository<Feedback, Long> {
 
 	@RestResource(exported = false)
