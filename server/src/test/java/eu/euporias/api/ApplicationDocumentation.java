@@ -89,7 +89,7 @@ public class ApplicationDocumentation {
 				)
 				.andExpect(status().isNoContent())
 				.andDo(document("applications-update-example", requestFields(
-					Field.descriptors(Field.id, Field.name, Field.secret, Field.readOnlySecret, Field.products)
+					Field.descriptors(Field.id, Field.name, Field.products)
 				)));
 		}finally{
 			applicationRepository.delete(applicationRepository.findByName(testApp.getName()));
@@ -104,7 +104,7 @@ public class ApplicationDocumentation {
 				.perform(get("/applications/" + testApp.getId()))
 				.andExpect(status().isOk())
 				.andDo(document("applications-get-example", responseFields(
-					Field.descriptors(Field.name, Field.secret, Field.readOnlySecret, Field.products, Field._links)
+					Field.descriptors(Field.name, Field.products, Field._links)
 				)));
 		}finally{
 			applicationRepository.delete(testApp);
@@ -123,7 +123,7 @@ public class ApplicationDocumentation {
 				)
 				.andExpect(status().isCreated())
 				.andDo(document("applications-create-example", requestFields(
-					Field.descriptors(Field.id, Field.name, Field.secret, Field.readOnlySecret, Field.products)
+					Field.descriptors(Field.name, Field.products)
 				)));
 		}finally{
 			applicationRepository.delete(applicationRepository.findByName(testApp.getName()));

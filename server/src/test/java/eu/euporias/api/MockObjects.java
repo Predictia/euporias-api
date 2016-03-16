@@ -3,6 +3,9 @@ package eu.euporias.api;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import eu.euporias.api.model.Application;
 import eu.euporias.api.model.Parameter;
 import eu.euporias.api.model.ParameterType;
@@ -31,6 +34,23 @@ class MockObjects {
 		parameter.setParameterType(type);
 		parameter.setFormat(format);
 		return parameter;
+	}
+	
+	public static ObjectNode testOutcome(Application testApp){
+		ObjectNode json = JsonNodeFactory.instance.objectNode(); 
+		json.set("application", JsonNodeFactory.instance.textNode("http://localhost:8080/applications/" + testApp.getId()));
+		{
+			ObjectNode product = JsonNodeFactory.instance.objectNode();
+			product.set("name", JsonNodeFactory.instance.textNode(testApp.getProducts().iterator().next().getName()));
+			json.set("product", product);
+		}{
+			ObjectNode parameters = JsonNodeFactory.instance.objectNode();
+			parameters.set("reportName", JsonNodeFactory.instance.textNode("EUPORIAS PowerPoint Template"));
+			json.set("parameters", parameters);
+		}
+		json.set("outcomeType", JsonNodeFactory.instance.textNode("FILE"));
+		json.set("mimeType", JsonNodeFactory.instance.textNode("applicationapplication/vnd.openxmlformats-officedocument.presentationml.presentation"));
+		return json;
 	}
 	
 }

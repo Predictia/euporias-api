@@ -122,7 +122,6 @@ include::{snippets}/index-example/links.adoc[]
 The Applications resources is used to create and manage applications and its associated products and parameters.
 
 
-
 [[resources-applications-list]]
 === Listing applications
 
@@ -139,24 +138,6 @@ include::{snippets}/applications-list-example/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/applications-list-example/http-response.adoc[]
-
-
-[[resources-applications-get]]
-=== Details of an application
-
-A `GET` request will list all of the application's details.
-
-==== Response structure
-
-include::{snippets}/applications-get-example/response-fields.adoc[]
-
-==== Example request
-
-include::{snippets}/applications-get-example/curl-request.adoc[]
-
-==== Example response
-
-include::{snippets}/applications-get-example/http-response.adoc[]
 
 
 [[resources-applications-create]]
@@ -176,18 +157,23 @@ include::{snippets}/applications-create-example/curl-request.adoc[]
 
 include::{snippets}/applications-create-example/http-response.adoc[]
 
-[[resources-applications-delete]]
-=== Deleting an application
+[[resources-applications-get]]
+=== Details of an application
 
-A `DELETE` request is used to delete an application
+A `GET` request will list all of the application's details.
+
+==== Response structure
+
+include::{snippets}/applications-get-example/response-fields.adoc[]
 
 ==== Example request
 
-include::{snippets}/applications-delete-example/curl-request.adoc[]
+include::{snippets}/applications-get-example/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/applications-delete-example/http-response.adoc[]
+include::{snippets}/applications-get-example/http-response.adoc[]
+
 
 [[resources-applications-update]]
 === Updating an application
@@ -205,3 +191,43 @@ include::{snippets}/applications-update-example/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/applications-update-example/http-response.adoc[]
+
+
+[[resources-applications-delete]]
+=== Deleting an application
+
+A `DELETE` request is used to delete an application
+
+==== Example request
+
+include::{snippets}/applications-delete-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/applications-delete-example/http-response.adoc[]
+
+
+
+
+[[resources-outcomes]]
+== Outcomes
+
+The Outcomes resources is used to store and retrieve outcomes usging its associated parameters.
+
+
+[[resources-outcomes-create]]
+=== Storing an outcome
+
+A `POST` request is used to store an outcome
+
+==== Request structure
+
+include::{snippets}/outcomes-create-example/request-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/outcomes-create-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/outcomes-create-example/http-response.adoc[]
