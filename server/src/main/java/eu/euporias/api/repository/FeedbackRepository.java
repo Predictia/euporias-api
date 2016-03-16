@@ -10,6 +10,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import eu.euporias.api.model.Application;
 import eu.euporias.api.model.Feedback;
 import eu.euporias.api.model.Outcome;
 
@@ -20,6 +21,9 @@ public interface FeedbackRepository extends PagingAndSortingRepository<Feedback,
 	@PreAuthorize("#oauth2.clientHasRole(#outcome.application.authority) or #oauth2.clientHasRole('ROLE_ADMIN')")
 	public Page<Feedback> findByOutcomeOrderByLastModifiedDateDesc(@Param("outcome") Outcome outcome, Pageable page);
 
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void deleteByOutcomeApplication(Application application);
+	
 	@Override
 	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
 	public Page<Feedback> findAll(Sort pageable);

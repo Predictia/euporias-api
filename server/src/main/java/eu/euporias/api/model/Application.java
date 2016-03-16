@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Application implements GrantedAuthority {
 
@@ -23,7 +25,7 @@ public class Application implements GrantedAuthority {
 	 */
 	public static final String AUTHORITY_PREFIX = "APP_";
 	
-	@Override
+	@Override @JsonIgnore
 	public String getAuthority() {
 		return AUTHORITY_PREFIX + getName();
 	}

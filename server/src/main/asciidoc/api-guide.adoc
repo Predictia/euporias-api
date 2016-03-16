@@ -1,5 +1,5 @@
 = EUPORIAS API Guide
-Andy Wilkinson;
+Predictia Intelligent Data Solutions;
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -97,6 +97,8 @@ The index provides the entry point into the service.
 
 A `GET` request is used to access the index
 
+include::{snippets}/index-example/curl-request.adoc[]
+
 ==== Response structure
 
 include::{snippets}/index-example/response-fields.adoc[]
@@ -117,7 +119,7 @@ include::{snippets}/index-example/links.adoc[]
 [[resources-applications]]
 == Applications
 
-The Applications resources is used to create and manage applications and its associated products.
+The Applications resources is used to create and manage applications and its associated products and parameters.
 
 
 
@@ -156,3 +158,16 @@ include::{snippets}/applications-create-example/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/applications-create-example/http-response.adoc[]
+
+[[resources-applications-delete]]
+=== Deleting an application
+
+A `DELETE` request is used to delete an application
+
+==== Example request
+
+include::{snippets}/applications-delete-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/applications-delete-example/http-response.adoc[]

@@ -27,7 +27,7 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 		@Param("product") Product product, 
 		Pageable page
 	);
-
+	
 	@Override
 	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
 	public Page<Outcome> findAll(Sort pageable);
@@ -39,6 +39,12 @@ public interface OutcomeRepository extends PagingAndSortingRepository<Outcome, L
 	@Override
 	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
 	void deleteAll();
+	
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void deleteByApplication(Application application);
+	
+	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
+	public void deleteByApplicationAndProduct(@Param("application") Application application, @Param("product") Product product);
 	
 	@Override
 	@PreAuthorize("#oauth2.clientHasRole('ROLE_ADMIN')")
