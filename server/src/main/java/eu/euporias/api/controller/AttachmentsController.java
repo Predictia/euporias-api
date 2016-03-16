@@ -54,7 +54,11 @@ public class AttachmentsController {
 	
 	private String storeAndGetRelativePath(MultipartFile mpFile){
 		try{
-			File tmpFile = File.createTempFile("upload.-", "." + getFileExtension(mpFile.getOriginalFilename()));
+			String extension = getFileExtension(mpFile.getOriginalFilename());
+			if(extension.isEmpty()){
+				extension = "tmp";
+			}
+			File tmpFile = File.createTempFile("upload.-", "." + extension);
 			tmpFile.deleteOnExit();
 			mpFile.transferTo(tmpFile);
 			File destFile = storageService.storeFile(tmpFile);

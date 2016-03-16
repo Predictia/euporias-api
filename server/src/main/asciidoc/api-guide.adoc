@@ -212,22 +212,101 @@ include::{snippets}/applications-delete-example/http-response.adoc[]
 [[resources-outcomes]]
 == Outcomes
 
-The Outcomes resources is used to store and retrieve outcomes usging its associated parameters.
+The Outcomes resources is used to store and retrieve outcomes using its associated parameters.
 
 
 [[resources-outcomes-create]]
-=== Storing an outcome
+=== Storing an outcome of file type
 
-A `POST` request is used to store an outcome
+==== Creating the outcome
 
-==== Request structure
+A `POST` request is used to create an outcome. Further requests will be necessary to store the results, as an attachment.
+
+===== Request structure
 
 include::{snippets}/outcomes-create-example/request-fields.adoc[]
 
-==== Example request
+===== Example request
 
 include::{snippets}/outcomes-create-example/curl-request.adoc[]
 
-==== Example response
+===== Example response
 
 include::{snippets}/outcomes-create-example/http-response.adoc[]
+
+==== Attaching the file
+
+===== Example request
+
+include::{snippets}/outcomes-attach-example/curl-request.adoc[]
+
+===== Example response
+
+include::{snippets}/outcomes-attach-example/http-response.adoc[]
+
+==== Retrieving the file
+
+===== Example request
+
+include::{snippets}/outcomes-attach-retrieve-example/curl-request.adoc[]
+
+===== Example response
+
+include::{snippets}/outcomes-attach-retrieve-example/http-response.adoc[]
+
+==== Deleting the file
+
+===== Example request
+
+include::{snippets}/outcomes-attach-delete-example/curl-request.adoc[]
+
+===== Example response
+
+include::{snippets}/outcomes-attach-delete-example/http-response.adoc[]
+
+=== Storing an outcome of embedded type
+
+==== Creating the outcome
+
+A `POST` request is used to create an outcome and store its contents. This type of outcomes show the results in the API calls directly (files will be encoded in Base64), and it's intended for texts or small files, such as small PNG graphs.   
+
+===== Request structure
+
+include::{snippets}/outcomes-create-embedded-example/request-fields.adoc[]
+
+===== Example request
+
+include::{snippets}/outcomes-create-embedded-example/curl-request.adoc[]
+
+===== Example response
+
+include::{snippets}/outcomes-create-embedded-example/http-response.adoc[]
+
+=== Updating an outocome 
+
+A `PUT` request is used to update an outcome.   
+
+==== Request structure
+
+include::{snippets}/outcomes-update-example/request-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/outcomes-update-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/outcomes-update-example/http-response.adoc[]
+
+=== Deleting an outocome 
+
+A `DELETE` request is used to delete an outcome.   
+
+==== Example request
+
+include::{snippets}/outcomes-delete-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/outcomes-delete-example/http-response.adoc[]
+

@@ -1,17 +1,22 @@
 package eu.euporias.api;
 
-
-
+import static eu.euporias.api.MockObjects.embeddedOutcome;
+import static eu.euporias.api.MockObjects.fileWithRandomContent;
 import static eu.euporias.api.MockObjects.testApplication;
 import static eu.euporias.api.MockObjects.testOutcome;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.fileUpload;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.stream.Stream;
 
 import org.junit.Before;
@@ -21,16 +26,20 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentation;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import eu.euporias.api.model.Application;
 import eu.euporias.api.repository.ApplicationRepository;
@@ -42,21 +51,148 @@ import eu.euporias.api.repository.ApplicationRepository;
 public class OutcomeDocumentation {
 	
 	@Test
-	public void outcomesCreateExample() throws Exception {
+	public void outcomesCreateEmbeddedExample() throws Exception {
 		Application testApp = applicationRepository.save(testApplication());
 		try{
 			this.mockMvc
 				.perform(post("/outcomes")
 					.contentType(MediaTypes.HAL_JSON)
-					.content(this.objectMapper.writeValueAsString(testOutcome(testApp)))
+					.content(this.objectMapper.writeValueAsString(embeddedOutcome(testApp)))
 				)
 				.andExpect(status().isCreated())
+				.andDo(document("outcomes-create-embedded-example", requestFields(
+					Field.descriptors(
+						Field.application, Field.product, Field.results,
+						Field.parameters, Field.outcomeType, Field.mimeType
+					)
+				)));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	@Test
+	public void outcomesCreateExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			createTestOutcome(testApp)
 				.andDo(document("outcomes-create-example", requestFields(
 					Field.descriptors(
 						Field.application, Field.product,
 						Field.parameters, Field.outcomeType, Field.mimeType
 					)
 				)));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+
+	private ResultActions createTestOutcome(Application testApp) throws Exception{
+		return this.mockMvc
+			.perform(post("/outcomes")
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(testOutcome(testApp)))
+			)
+			.andExpect(status().isCreated());
+	}
+	
+	@Test
+	public void outcomesAttachExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			String location = createTestOutcome(testApp).andReturn()
+				.getResponse().getHeader("Location");
+			uploadFile(location)
+				.andDo(document("outcomes-attach-example"));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	private ResultActions uploadFile(String location) throws Exception{
+		File file = fileWithRandomContent();
+		MockMultipartFile upload = new MockMultipartFile("file", new FileInputStream(file));
+		return this.mockMvc
+			.perform(fileUpload("/attachments/outcomes/" + idFromPath(location))
+				.file(upload)
+			)
+			.andExpect(status().isOk());
+	}
+	
+	private static String idFromPath(String location){
+		String[] els = location.split("/");
+		return els[els.length - 1];
+	}
+	
+	@Test
+	public void outcomesAttachRetrieveExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			String location = createTestOutcome(testApp).andReturn()
+				.getResponse().getHeader("Location");
+			uploadFile(location);
+			this.mockMvc
+				.perform(get("/attachments/outcomes/" + idFromPath(location) + "/0"))
+				.andExpect(status().isOk())
+				.andDo(document("outcomes-attach-retrieve-example"));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	@Test
+	public void outcomesAttachDeleteExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			String location = createTestOutcome(testApp).andReturn()
+				.getResponse().getHeader("Location");
+			uploadFile(location);
+			this.mockMvc
+				.perform(delete("/attachments/outcomes/" + idFromPath(location) + "/0"))
+				.andExpect(status().isOk())
+				.andDo(document("outcomes-attach-delete-example"));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	@Test
+	public void outcomesUpdateExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			String location = createTestOutcome(testApp).andReturn()
+				.getResponse().getHeader("Location");
+			ObjectNode updatedOutcome = testOutcome(testApp);
+			updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
+			this.mockMvc
+				.perform(put("/outcomes/" + idFromPath(location))
+					.contentType(MediaTypes.HAL_JSON)
+					.content(this.objectMapper.writeValueAsString(updatedOutcome))
+				)
+				.andExpect(status().isNoContent())
+				.andDo(document("outcomes-update-example", requestFields(
+					Field.descriptors(
+						Field.application, Field.product,
+						Field.parameters, Field.outcomeType, Field.mimeType
+					)
+				)));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	@Test
+	public void outcomesDeleteExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			String location = createTestOutcome(testApp).andReturn()
+				.getResponse().getHeader("Location");
+			ObjectNode updatedOutcome = testOutcome(testApp);
+			updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
+			this.mockMvc
+				.perform(delete("/outcomes/" + idFromPath(location)))
+				.andExpect(status().isNoContent())
+				.andDo(document("outcomes-delete-example"));
 		}finally{
 			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
 		}
