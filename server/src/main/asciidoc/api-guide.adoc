@@ -13,7 +13,7 @@ Predictia Intelligent Data Solutions;
 [[overview-http-verbs]]
 == HTTP verbs
 
-RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+The EUPORIAS API tries to adhere as closely as possible to standard HTTP and REST conventions in its
 use of HTTP verbs.
 
 |===
@@ -35,7 +35,7 @@ use of HTTP verbs.
 [[overview-http-status-codes]]
 == HTTP status codes
 
-RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+The EUPORIAS API tries to adhere as closely as possible to standard HTTP and REST conventions in its
 use of HTTP status codes.
 
 |===
@@ -74,7 +74,7 @@ include::{snippets}/error-example/http-response.adoc[]
 [[overview-hypermedia]]
 == Hypermedia
 
-RESTful Notes uses hypermedia and resources include links to other resources in their
+The EUPORIAS API uses hypermedia and resources include links to other resources in their
 responses. Responses are in http://stateless.co/hal_specification.html[Hypertext Application
 from resource to resource.
 Language (HAL)] format. Links can be found beneath the `_links` key. Users of the API should
@@ -310,3 +310,35 @@ include::{snippets}/outcomes-delete-example/curl-request.adoc[]
 
 include::{snippets}/outcomes-delete-example/http-response.adoc[]
 
+
+=== Finding outocomes 
+
+A `GET` request is used to retrieve outcomes.   
+
+==== Response structure
+
+include::{snippets}/outcomes-search-example/response-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/outcomes-search-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/outcomes-search-example/http-response.adoc[]
+
+=== Finding outocomes metadata 
+
+A `GET` request is used to explore available parameters values from the outcomes.   
+
+==== Response structure
+
+include::{snippets}/outcomes-search-meta-example/response-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/outcomes-search-meta-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/outcomes-search-meta-example/http-response.adoc[]

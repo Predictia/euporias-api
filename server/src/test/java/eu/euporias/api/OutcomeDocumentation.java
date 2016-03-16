@@ -13,6 +13,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
@@ -198,6 +199,46 @@ public class OutcomeDocumentation {
 		}
 	}
 	
+	@Test
+	public void outcomesSearchMetaExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			createTestOutcome(testApp);
+			this.mockMvc
+				.perform(get("/outcomes/search/metadata")
+					.param("application", testApp.getId().toString())
+					.param("product", testApp.getProducts().iterator().next().getName())
+					.param("parameter", "reportName")
+				)
+				.andExpect(status().isOk())
+				.andDo(document("outcomes-search-meta-example", responseFields(
+					Field.descriptors(Field._links, Field._embedded, Field.page)
+				)));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
+	@Test
+	public void outcomesSearchExample() throws Exception {
+		Application testApp = applicationRepository.save(testApplication());
+		try{
+			createTestOutcome(testApp);
+			this.mockMvc
+				.perform(get("/outcomes/search/parameters")
+					.param("application", testApp.getId().toString())
+					.param("product", testApp.getProducts().iterator().next().getName())
+					.param("reportName", "EUPORIAS PowerPoint Template")
+				)
+				.andExpect(status().isOk())
+				.andDo(document("outcomes-search-example", responseFields(
+					Field.descriptors(Field._links, Field._embeddedOutcomes, Field.page)
+				)));
+		}finally{
+			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
+		}
+	}
+	
 	private enum Field{
 		
 		id("The id code of the outcome"),
@@ -210,6 +251,8 @@ public class OutcomeDocumentation {
 		results("Results of the outcome"),
 		lastModifiedDate("Last modified date"),
 		_links("<<resources-index-links,Links>> to other resources"),
+		_embeddedOutcomes("_embedded.outcomes", "An array of <<resources-outcomes, Outcome resources>>"),
+		_embedded("An object with arrays of responses indexed by type"),
 		page("Results pagination details")
 		;
 		
