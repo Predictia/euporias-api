@@ -80,7 +80,14 @@ public class Application implements GrantedAuthority {
 	}
 
 	public void setProducts(Set<Product> products) {
-		this.products = products;
+		if(this.products == null){
+			this.products = products;
+		}else{
+			this.products.clear();
+			if(products != null){
+				this.products.addAll(products);
+			}
+		}
 	}
 
 	@Override

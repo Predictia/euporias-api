@@ -141,6 +141,23 @@ include::{snippets}/applications-list-example/curl-request.adoc[]
 include::{snippets}/applications-list-example/http-response.adoc[]
 
 
+[[resources-applications-get]]
+=== Details of an application
+
+A `GET` request will list all of the application's details.
+
+==== Response structure
+
+include::{snippets}/applications-get-example/response-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/applications-get-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/applications-get-example/http-response.adoc[]
+
 
 [[resources-applications-create]]
 === Creating an application
@@ -171,3 +188,20 @@ include::{snippets}/applications-delete-example/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/applications-delete-example/http-response.adoc[]
+
+[[resources-applications-update]]
+=== Updating an application
+
+A `PUT` request is used to update an application. For example, we can modify an application's parameters for a certain product: 
+
+==== Request structure
+
+include::{snippets}/applications-update-example/request-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/applications-update-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/applications-update-example/http-response.adoc[]

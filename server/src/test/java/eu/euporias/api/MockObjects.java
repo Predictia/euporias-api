@@ -24,7 +24,7 @@ class MockObjects {
 		return testApp;
 	}
 	
-	private static Parameter parameter(String name, String description, ParameterType type, String format){
+	public static Parameter parameter(String name, String description, ParameterType type, String format){
 		Parameter parameter = new Parameter();
 		parameter.setName(name);
 		parameter.setDescription(description);
