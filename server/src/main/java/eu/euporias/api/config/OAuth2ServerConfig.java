@@ -8,7 +8,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -27,7 +26,6 @@ import eu.euporias.api.repository.ApplicationRepository;
 import eu.euporias.api.repository.RoleRepository;
 import eu.euporias.api.repository.UserRepository;
 
-@Profile(value = {"default"})
 @Configuration
 @EnableAuthorizationServer
 @Transactional
@@ -40,8 +38,7 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter imp
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients
-			.withClientDetails(this);
+		clients.withClientDetails(this);
 	}
 
 	@Override
