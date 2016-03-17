@@ -19,13 +19,14 @@ import eu.euporias.api.model.Product;
 
 class MockObjects {
 
-	private static final String TEST_APP_NAME = "TEST";
+	public static final String TEST_APP_NAME = "TEST";
+	public static final String TEST_PRODUCT_NAME = "test reports";
 	
 	public static Application testApplication(){
 		Application testApp = new Application();
 		testApp.setName(TEST_APP_NAME);
 		Product product = new Product();
-		product.setName("test reports");
+		product.setName(TEST_PRODUCT_NAME);
 		product.setParameters(Stream.of(
 			parameter("reportName", "name of the report", ParameterType.TEXT, null)
 		).collect(Collectors.toSet()));
@@ -42,8 +43,8 @@ class MockObjects {
 		return parameter;
 	}
 	
-	public static ObjectNode testOutcome(Application testApp){
-		ObjectNode json = baseOutcomeNode(testApp);
+	public static ObjectNode testOutcome(Long applicationId){
+		ObjectNode json = baseOutcomeNode(applicationId);
 		{
 			ObjectNode parameters = JsonNodeFactory.instance.objectNode();
 			parameters.set("reportName", JsonNodeFactory.instance.textNode("EUPORIAS PowerPoint Template"));
@@ -54,19 +55,19 @@ class MockObjects {
 		return json;
 	}
 	
-	private static ObjectNode baseOutcomeNode(Application testApp){
+	private static ObjectNode baseOutcomeNode(Long applicationId){
 		ObjectNode json = JsonNodeFactory.instance.objectNode(); 
-		json.set("application", JsonNodeFactory.instance.textNode("http://localhost:8080/applications/" + testApp.getId()));
+		json.set("application", JsonNodeFactory.instance.textNode("http://localhost:8080/applications/" + applicationId));
 		{
 			ObjectNode product = JsonNodeFactory.instance.objectNode();
-			product.set("name", JsonNodeFactory.instance.textNode(testApp.getProducts().iterator().next().getName()));
+			product.set("name", JsonNodeFactory.instance.textNode(TEST_PRODUCT_NAME));
 			json.set("product", product);
 		}
 		return json;
 	}
 	
-	public static ObjectNode embeddedOutcome(Application testApp){
-		ObjectNode json = baseOutcomeNode(testApp);
+	public static ObjectNode embeddedOutcome(Long applicationId){
+		ObjectNode json = baseOutcomeNode(applicationId);
 		{
 			ObjectNode parameters = JsonNodeFactory.instance.objectNode();
 			parameters.set("reportName", JsonNodeFactory.instance.textNode("Example text file"));

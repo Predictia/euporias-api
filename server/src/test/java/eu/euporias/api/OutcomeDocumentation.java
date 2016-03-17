@@ -1,5 +1,6 @@
 package eu.euporias.api;
 
+import static eu.euporias.api.MockObjects.TEST_PRODUCT_NAME;
 import static eu.euporias.api.MockObjects.embeddedOutcome;
 import static eu.euporias.api.MockObjects.fileWithRandomContent;
 import static eu.euporias.api.MockObjects.testApplication;
@@ -14,23 +15,25 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentation;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,66 +51,53 @@ import eu.euporias.api.repository.ApplicationRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ApiApplication.class)
 @WebAppConfiguration
-@ActiveProfiles(value = "test")
 public class OutcomeDocumentation {
 	
 	@Test
 	public void outcomesCreateEmbeddedExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			this.mockMvc
-				.perform(post("/outcomes")
-					.contentType(MediaTypes.HAL_JSON)
-					.content(this.objectMapper.writeValueAsString(embeddedOutcome(testApp)))
+		this.mockMvc
+			.perform(post("/outcomes")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(embeddedOutcome(application.getId())))
+			)
+			.andExpect(status().isCreated())
+			.andDo(document("outcomes-create-embedded-example", requestFields(
+				Field.descriptors(
+					Field.application, Field.product, Field.results,
+					Field.parameters, Field.outcomeType, Field.mimeType
 				)
-				.andExpect(status().isCreated())
-				.andDo(document("outcomes-create-embedded-example", requestFields(
-					Field.descriptors(
-						Field.application, Field.product, Field.results,
-						Field.parameters, Field.outcomeType, Field.mimeType
-					)
-				)));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+			)));
 	}
 	
 	@Test
 	public void outcomesCreateExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			createTestOutcome(testApp)
-				.andDo(document("outcomes-create-example", requestFields(
-					Field.descriptors(
-						Field.application, Field.product,
-						Field.parameters, Field.outcomeType, Field.mimeType
-					)
-				)));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		createTestOutcome()
+			.andDo(document("outcomes-create-example", requestFields(
+				Field.descriptors(
+					Field.application, Field.product,
+					Field.parameters, Field.outcomeType, Field.mimeType
+				)
+			)));
 	}
 
-	private ResultActions createTestOutcome(Application testApp) throws Exception{
+	private ResultActions createTestOutcome() throws Exception{
 		return this.mockMvc
 			.perform(post("/outcomes")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
 				.contentType(MediaTypes.HAL_JSON)
-				.content(this.objectMapper.writeValueAsString(testOutcome(testApp)))
+				.content(this.objectMapper.writeValueAsString(testOutcome(application.getId())))
 			)
 			.andExpect(status().isCreated());
 	}
 	
 	@Test
 	public void outcomesAttachExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			String location = createTestOutcome(testApp).andReturn()
-				.getResponse().getHeader("Location");
-			uploadFile(location)
-				.andDo(document("outcomes-attach-example"));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		String location = createTestOutcome().andReturn()
+			.getResponse().getHeader("Location");
+		uploadFile(location)
+			.andDo(document("outcomes-attach-example"));
+		
 	}
 	
 	private ResultActions uploadFile(String location) throws Exception{
@@ -116,6 +106,7 @@ public class OutcomeDocumentation {
 		return this.mockMvc
 			.perform(fileUpload("/attachments/outcomes/" + idFromPath(location))
 				.file(upload)
+				.header("Authorization", tokenHolder.tokenHeaderValue())
 			)
 			.andExpect(status().isOk());
 	}
@@ -127,116 +118,90 @@ public class OutcomeDocumentation {
 	
 	@Test
 	public void outcomesAttachRetrieveExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			String location = createTestOutcome(testApp).andReturn()
-				.getResponse().getHeader("Location");
-			uploadFile(location);
-			this.mockMvc
-				.perform(get("/attachments/outcomes/" + idFromPath(location) + "/0"))
-				.andExpect(status().isOk())
-				.andDo(document("outcomes-attach-retrieve-example"));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		String location = createTestOutcome().andReturn()
+			.getResponse().getHeader("Location");
+		uploadFile(location);
+		this.mockMvc
+			.perform(get("/attachments/outcomes/" + idFromPath(location) + "/0").header("Authorization", tokenHolder.tokenHeaderValue()))
+			.andExpect(status().isOk())
+			.andDo(document("outcomes-attach-retrieve-example"));
 	}
 	
 	@Test
 	public void outcomesAttachDeleteExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			String location = createTestOutcome(testApp).andReturn()
-				.getResponse().getHeader("Location");
-			uploadFile(location);
-			this.mockMvc
-				.perform(delete("/attachments/outcomes/" + idFromPath(location) + "/0"))
-				.andExpect(status().isOk())
-				.andDo(document("outcomes-attach-delete-example"));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		String location = createTestOutcome().andReturn()
+			.getResponse().getHeader("Location");
+		uploadFile(location);
+		this.mockMvc
+			.perform(delete("/attachments/outcomes/" + idFromPath(location) + "/0").header("Authorization", tokenHolder.tokenHeaderValue()))
+			.andExpect(status().isOk())
+			.andDo(document("outcomes-attach-delete-example"));
+		
 	}
 	
 	@Test
 	public void outcomesUpdateExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			String location = createTestOutcome(testApp).andReturn()
-				.getResponse().getHeader("Location");
-			ObjectNode updatedOutcome = testOutcome(testApp);
-			updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
-			this.mockMvc
-				.perform(put("/outcomes/" + idFromPath(location))
-					.contentType(MediaTypes.HAL_JSON)
-					.content(this.objectMapper.writeValueAsString(updatedOutcome))
+		String location = createTestOutcome().andReturn()
+			.getResponse().getHeader("Location");
+		ObjectNode updatedOutcome = testOutcome(application.getId());
+		updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
+		this.mockMvc
+			.perform(put("/outcomes/" + idFromPath(location))
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(updatedOutcome))
+			)
+			.andExpect(status().isNoContent())
+			.andDo(document("outcomes-update-example", requestFields(
+				Field.descriptors(
+					Field.application, Field.product,
+					Field.parameters, Field.outcomeType, Field.mimeType
 				)
-				.andExpect(status().isNoContent())
-				.andDo(document("outcomes-update-example", requestFields(
-					Field.descriptors(
-						Field.application, Field.product,
-						Field.parameters, Field.outcomeType, Field.mimeType
-					)
-				)));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+			)));
 	}
 	
 	@Test
 	public void outcomesDeleteExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			String location = createTestOutcome(testApp).andReturn()
-				.getResponse().getHeader("Location");
-			ObjectNode updatedOutcome = testOutcome(testApp);
-			updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
-			this.mockMvc
-				.perform(delete("/outcomes/" + idFromPath(location)))
-				.andExpect(status().isNoContent())
-				.andDo(document("outcomes-delete-example"));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		String location = createTestOutcome().andReturn()
+			.getResponse().getHeader("Location");
+		ObjectNode updatedOutcome = testOutcome(application.getId());
+		updatedOutcome.set("mimeType", JsonNodeFactory.instance.textNode("other mime type"));
+		this.mockMvc
+			.perform(delete("/outcomes/" + idFromPath(location)).header("Authorization", tokenHolder.tokenHeaderValue()))
+			.andExpect(status().isNoContent())
+			.andDo(document("outcomes-delete-example"));
 	}
 	
 	@Test
 	public void outcomesSearchMetaExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			createTestOutcome(testApp);
-			this.mockMvc
-				.perform(get("/outcomes/search/metadata")
-					.param("application", testApp.getId().toString())
-					.param("product", testApp.getProducts().iterator().next().getName())
-					.param("parameter", "reportName")
-				)
-				.andExpect(status().isOk())
-				.andDo(document("outcomes-search-meta-example", responseFields(
-					Field.descriptors(Field._links, Field._embedded, Field.page)
-				)));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		createTestOutcome();
+		this.mockMvc
+			.perform(get("/outcomes/search/metadata")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.param("application", application.getId().toString())
+				.param("product", TEST_PRODUCT_NAME)
+				.param("parameter", "reportName")
+			)
+			.andExpect(status().isOk())
+			.andDo(document("outcomes-search-meta-example", responseFields(
+				Field.descriptors(Field._links, Field._embedded, Field.page)
+			)));
 	}
 	
 	@Test
 	public void outcomesSearchExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			createTestOutcome(testApp);
-			this.mockMvc
-				.perform(get("/outcomes/search/parameters")
-					.param("application", testApp.getId().toString())
-					.param("product", testApp.getProducts().iterator().next().getName())
-					.param("reportName", "EUPORIAS PowerPoint Template")
-				)
-				.andExpect(status().isOk())
-				.andDo(document("outcomes-search-example", responseFields(
-					Field.descriptors(Field._links, Field._embeddedOutcomes, Field.page)
-				)));
-		}finally{
-			this.mockMvc.perform(delete("/applications/" + testApp.getId()));
-		}
+		createTestOutcome();
+		this.mockMvc
+			.perform(get("/outcomes/search/parameters")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.param("application", application.getId().toString())
+				.param("product", TEST_PRODUCT_NAME)
+				.param("reportName", "EUPORIAS PowerPoint Template")
+			)
+			.andExpect(status().isOk())
+			.andDo(document("outcomes-search-example", responseFields(
+				Field.descriptors(Field._links, Field._embeddedOutcomes, Field.page)
+			)));
 	}
 	
 	private enum Field{
@@ -280,12 +245,53 @@ public class OutcomeDocumentation {
 	
 	private MockMvc mockMvc;
 	
+
+	private Application application;
+	
+	private TokenHolder tokenHolder;
+	
 	@Before
 	public void setUp() throws Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
+			.apply(springSecurity())
 			.apply(documentationConfiguration(this.restDocumentation))
-			.build();			
+			.build();
+		this.tokenHolder = new TokenHolder(objectMapper);
+		loginAsAdmin();
+		createTestApp();
+		tokenHolder.login(mockMvc, application.getName(), application.getSecret());
 	}
+	
+	private void loginAsAdmin() throws Exception{
+		tokenHolder.login(mockMvc, ADMIN_USERNAME, defaultAdminPassword);
+	}
+	
+	private void createTestApp() throws Exception{
+		Application testApp = testApplication();
+		this.mockMvc.perform(
+			post("/applications")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(testApp))
+			)
+			.andExpect(status().isCreated());
+		this.application = applicationRepository.findByName(testApp.getName());
+	}
+	
+	@After
+	public void cleanUp() throws Exception {
+		loginAsAdmin();
+		this.mockMvc
+			.perform(delete("/applications/" + application.getId())
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+			)
+			.andExpect(status().isNoContent());
+	}
+	
+	private static final String ADMIN_USERNAME = "admin@api.euporias.eu";
+	
+	private @Value("${default.admin.password}") String defaultAdminPassword;
+
 	
 	@Rule
 	public final RestDocumentation restDocumentation = new RestDocumentation("target/generated-snippets");	

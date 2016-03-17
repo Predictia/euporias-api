@@ -93,12 +93,14 @@ public class OutcomeEventHandler {
 	public void handleOutcomeDelete(Outcome outcome) {
 		assignExistingProduct(outcome);
 		if(FILE_TYPES.contains(outcome.getOutcomeType())){
-			outcome.getResults()
-				.forEach((relativePath) -> {
-					File f = storageService.expandFilePath(relativePath);
-					LOGGER.info("Deleting file {} related to outcome #{}", f, outcome.getId());
-					f.delete();
-				});
+			if(outcome.getResults() != null){
+				outcome.getResults()
+					.forEach((relativePath) -> {
+						File f = storageService.expandFilePath(relativePath);
+						LOGGER.info("Deleting file {} related to outcome #{}", f, outcome.getId());
+						f.delete();
+					});
+			}
 		}
 	}
 	

@@ -37,27 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ApiDocumentation {
 	
 	@Test
-	public void indexExample() throws Exception {
-		this.mockMvc.perform(get("/"))
-			.andExpect(status().isOk())
-			.andDo(document("index-example",
-				INDEX_LINKS_SNIPPET,
-				INDEX_RESPONSE_SNIPPET
-			));
-
-	}
-
-	static final Snippet INDEX_LINKS_SNIPPET = links(
-		linkWithRel("applications").description("The <<resources-applications,Applications resource>>"),
-		linkWithRel("outcomes").description("The <<resources-outcomes,Outcomes resource>>"),
-		linkWithRel("profile").description("The ALPS profile for the service")
-	);
-	
-	static final Snippet INDEX_RESPONSE_SNIPPET = responseFields(
-		fieldWithPath("_links").description("<<resources-index-links,Links>> to other resources")
-	);
-	
-	@Test
 	public void errorExample() throws Exception {
 		this.mockMvc
 			.perform(get("/error")

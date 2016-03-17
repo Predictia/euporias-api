@@ -45,8 +45,7 @@ import eu.euporias.api.repository.ApplicationRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ApiApplication.class)
 @WebAppConfiguration
-@Transactional
-@Rollback(false)
+@Transactional @Rollback(false)
 public class ApplicationDocumentation {
 	
 	@Test
