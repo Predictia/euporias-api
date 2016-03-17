@@ -33,15 +33,6 @@ public class DataSourceConfig {
 		HikariDataSource ds = new HikariDataSource(hc);
 		return ds;
 	}
-
-	@Bean
-	public DSLContext dsl(DataSource dataSource) {
-		DataSourceConnectionProvider connectionProvider = new DataSourceConnectionProvider(dataSource);
-		DefaultConfiguration configuration = new DefaultConfiguration();
-		configuration.setConnectionProvider(connectionProvider);
-		configuration.setSQLDialect(SQLDialect.MYSQL);
-		return new DefaultDSLContext(configuration);
-	}
 	
 	private String getDataSourceUrl(){
 		return "jdbc:mysql://" + jdbcHost + ":" + jdbcPort +"/" + jdbcDatabase;
