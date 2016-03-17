@@ -258,12 +258,22 @@ public class OutcomeDocumentation {
 			.build();
 		this.tokenHolder = new TokenHolder(objectMapper);
 		loginAsAdmin();
+		cleanupTestApp();
 		createTestApp();
 		tokenHolder.login(mockMvc, application.getName(), application.getSecret());
 	}
 	
 	private void loginAsAdmin() throws Exception{
 		tokenHolder.login(mockMvc, ADMIN_USERNAME, defaultAdminPassword);
+	}
+	
+	private void cleanupTestApp() throws Exception{
+		Application testApp = applicationRepository.findByName(testApplication().getName());
+		if(testApp != null){
+			this.mockMvc
+				.perform(delete("/applications/" + testApp.getId()).header("Authorization", tokenHolder.tokenHeaderValue()))
+				.andExpect(status().isNoContent());
+		}
 	}
 	
 	private void createTestApp() throws Exception{
