@@ -11,6 +11,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.stream.Collectors;
@@ -21,15 +22,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.restdocs.RestDocumentation;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,13 +45,25 @@ import eu.euporias.api.repository.ApplicationRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ApiApplication.class)
 @WebAppConfiguration
-@ActiveProfiles(value = "test")
+@Transactional
+@Rollback(false)
 public class ApplicationDocumentation {
 	
 	@Test
-	public void applicationsListExample() throws Exception {
+	public void applicationsOperationsExample() throws Exception {
+		applicationsCreateExample();
+		try{
+			applicationsGetExample();
+			applicationsListExample();
+			applicationsUpdateExample();
+		}finally{
+			applicationsDeleteExample();
+		}
+	}
+	
+	private void applicationsListExample() throws Exception {
 		this.mockMvc
-			.perform(get("/applications"))
+			.perform(get("/applications").header("Authorization", tokenHolder.tokenHeaderValue()))
 			.andExpect(status().isOk())
 			.andDo(document("applications-list-example",
 				responseFields(
@@ -56,24 +71,31 @@ public class ApplicationDocumentation {
 				)
 			));
 	}
+	
+	private void applicationsCreateExample() throws Exception {
+		Application testApp = testApplication();
+		this.mockMvc
+			.perform(post("/applications")
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(testApp))
+			)
+			.andExpect(status().isCreated())
+			.andDo(document("applications-create-example", requestFields(
+				Field.descriptors(Field.name, Field.products)
+			)));
+		this.application = applicationRepository.findByName(testApp.getName());
+	}
 
-	@Test
-	public void applicationsDeleteExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			this.mockMvc
-				.perform(delete("/applications/" + testApp.getId()))
-				.andExpect(status().isNoContent())
-				.andDo(document("applications-delete-example"));
-		}finally{
-			applicationRepository.delete(testApp);
-		}
+	private void applicationsDeleteExample() throws Exception {
+		this.mockMvc
+			.perform(delete("/applications/" + application.getId()).header("Authorization", tokenHolder.tokenHeaderValue()))
+			.andExpect(status().isNoContent())
+			.andDo(document("applications-delete-example"));		
 	}
 	
-	@Test
-	public void applicationsUpdateExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		Product product = testApp.getProducts().iterator().next();
+	private void applicationsUpdateExample() throws Exception {
+		Product product = application.getProducts().iterator().next();
 		product.setId(null);
 		product.setParameters(Stream.of(
 			parameter("reportName", "new name of the report", ParameterType.TEXT, null),
@@ -81,53 +103,25 @@ public class ApplicationDocumentation {
 			parameter("stationLon", "longitude the station", ParameterType.NUMBER, "#0.##"),
 			parameter("stationLat", "latitude of the station", ParameterType.NUMBER, "#0.##")
 		).collect(Collectors.toSet()));
-		try{
-			this.mockMvc
-				.perform(put("/applications/" + testApp.getId())
-					.contentType(MediaTypes.HAL_JSON)
-					.content(this.objectMapper.writeValueAsString(testApp))
-				)
-				.andExpect(status().isNoContent())
-				.andDo(document("applications-update-example", requestFields(
-					Field.descriptors(Field.id, Field.name, Field.products)
-				)));
-		}finally{
-			applicationRepository.delete(applicationRepository.findByName(testApp.getName()));
-		}
+		this.mockMvc
+			.perform(put("/applications/" + application.getId())
+				.header("Authorization", tokenHolder.tokenHeaderValue())
+				.contentType(MediaTypes.HAL_JSON)
+				.content(this.objectMapper.writeValueAsString(application))
+			)
+			.andExpect(status().isNoContent())
+			.andDo(document("applications-update-example", requestFields(
+				Field.descriptors(Field.id, Field.name, Field.secret, Field.readOnlySecret, Field.products)
+			)));
 	}
 	
-	@Test
-	public void applicationsGetExample() throws Exception {
-		Application testApp = applicationRepository.save(testApplication());
-		try{
-			this.mockMvc
-				.perform(get("/applications/" + testApp.getId()))
-				.andExpect(status().isOk())
-				.andDo(document("applications-get-example", responseFields(
-					Field.descriptors(Field.name, Field.products, Field._links)
-				)));
-		}finally{
-			applicationRepository.delete(testApp);
-		}
-	}
-	
-	
-	@Test
-	public void applicationsCreateExample() throws Exception {
-		Application testApp = testApplication();
-		try{
-			this.mockMvc
-				.perform(post("/applications")
-					.contentType(MediaTypes.HAL_JSON)
-					.content(this.objectMapper.writeValueAsString(testApp))
-				)
-				.andExpect(status().isCreated())
-				.andDo(document("applications-create-example", requestFields(
-					Field.descriptors(Field.name, Field.products)
-				)));
-		}finally{
-			applicationRepository.delete(applicationRepository.findByName(testApp.getName()));
-		}
+	private void applicationsGetExample() throws Exception {
+		this.mockMvc
+			.perform(get("/applications/" + application.getId()).header("Authorization", tokenHolder.tokenHeaderValue()))
+			.andExpect(status().isOk())
+			.andDo(document("applications-get-example", responseFields(
+				Field.descriptors(Field.name, Field.products, Field.secret, Field.readOnlySecret, Field._links)
+			)));
 	}
 	
 	private enum Field{
@@ -166,12 +160,33 @@ public class ApplicationDocumentation {
 	
 	private MockMvc mockMvc;
 	
+	private Application application;
+	
+	private TokenHolder tokenHolder;
+	
 	@Before
 	public void setUp() throws Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
+			.apply(springSecurity())
 			.apply(documentationConfiguration(this.restDocumentation))
-			.build();			
+			.build();
+		this.tokenHolder = new TokenHolder(objectMapper);
+		loginAsAdmin();
+		Application testApp = applicationRepository.findByName(testApplication().getName());
+		if(testApp != null){
+			this.mockMvc
+				.perform(delete("/applications/" + testApp.getId()).header("Authorization", tokenHolder.tokenHeaderValue()))
+				.andExpect(status().isNoContent());
+		}
 	}
+	
+	private void loginAsAdmin() throws Exception{
+		tokenHolder.login(mockMvc, ADMIN_USERNAME, defaultAdminPassword);
+	}
+
+	private static final String ADMIN_USERNAME = "admin@api.euporias.eu";
+	
+	private @Value("${default.admin.password}") String defaultAdminPassword;
 	
 	@Rule
 	public final RestDocumentation restDocumentation = new RestDocumentation("target/generated-snippets");	

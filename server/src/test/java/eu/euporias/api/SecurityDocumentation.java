@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.restdocs.RestDocumentation;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,7 +57,6 @@ public class SecurityDocumentation {
 	@Before
 	public void setUp() throws Exception {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-			.addFilters(filterChainProxy)
 			.apply(springSecurity())
 			.apply(documentationConfiguration(this.restDocumentation))
 			.build();
@@ -103,6 +101,5 @@ public class SecurityDocumentation {
 	@Autowired private ObjectMapper objectMapper;
 	@Autowired private WebApplicationContext context;
 	@Autowired private ApplicationRepository applicationRepository;
-	@Autowired private FilterChainProxy filterChainProxy;
 
 }
