@@ -49,6 +49,10 @@ public class ApiClientLoader implements CommandLineRunner {
 			ArgumentList extraParameters = ParamUtils.parameters(args,ParamUtils.PARAMETER_PREDICATE);
 			String result = request.post("outcomes/",token,arguments,extraParameters);
 			logger.warn(result);
+		}else if("put".equals(action)){
+			ArgumentList extraParameters = ParamUtils.parameters(args,ParamUtils.PARAMETER_PREDICATE);
+			String result = request.put("outcomes/",token,arguments,extraParameters);
+			logger.warn(result);
 		}else{
 			throw new IllegalArgumentException("Invalid action "+action);
 		}

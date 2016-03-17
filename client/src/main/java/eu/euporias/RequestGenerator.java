@@ -16,6 +16,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -113,6 +114,17 @@ public class RequestGenerator {
 		post.setHeader("Authorization", "Bearer "+token);
 		post.setHeader("Content-type", JSON_DEFINITION);
 		HttpResponse response = httpClient().execute(post);
+		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+	}
+	
+	protected String put(String action,String token,ArgumentList parameters,ArgumentList extraParameters) throws UnsupportedOperationException, IOException{
+		HttpPut put = new HttpPut(config.get("apiUrl") + action);
+		String json = jsonPost(parameters,extraParameters);
+		StringEntity postString = new StringEntity(json);
+		put.setEntity(postString);
+		put.setHeader("Authorization", "Bearer "+token);
+		put.setHeader("Content-type", JSON_DEFINITION);
+		HttpResponse response = httpClient().execute(put);
 		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	}
 	
