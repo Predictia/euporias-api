@@ -80,10 +80,40 @@ from resource to resource.
 Language (HAL)] format. Links can be found beneath the `_links` key. Users of the API should
 not create URIs themselves, instead they should use the above-described links to navigate
 
+[[overview-security]]
+== Security
+
+The EUPORIAS API is secured following the Oauth2 protocol. Unless specified otherways all requests to the API 
+must provide a valid authentication token. 
+
+=== Token acquisition
+
+A `GET` request is used to obtain a token. You must provide your credentials in this request. Each application has
+associated a read write set of credentials, and a read only set of credentials. The application also has an administrator 
+account.  
+
+==== Example request
+
+include::{snippets}/token-get-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/token-get-example/http-response.adoc[]
+
+=== Token usage
+
+Once a valid token is obtained, you must provide your token in following requests as a header parameter. 
+
+==== Example request
+
+include::{snippets}/token-use-example/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/token-use-example/http-response.adoc[]
+
 [[resources]]
 = Resources
-
-
 
 [[resources-index]]
 == Index

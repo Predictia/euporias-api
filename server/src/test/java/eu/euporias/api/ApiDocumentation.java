@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.restdocs.RestDocumentation;
+import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,17 +41,22 @@ public class ApiDocumentation {
 		this.mockMvc.perform(get("/"))
 			.andExpect(status().isOk())
 			.andDo(document("index-example",
-				links(
-					linkWithRel("applications").description("The <<resources-applications,Applications resource>>"),
-					linkWithRel("outcomes").description("The <<resources-outcomes,Outcomes resource>>"),
-					linkWithRel("profile").description("The ALPS profile for the service")
-				),
-				responseFields(
-					fieldWithPath("_links").description("<<resources-index-links,Links>> to other resources")))
-				);
+				INDEX_LINKS_SNIPPET,
+				INDEX_RESPONSE_SNIPPET
+			));
 
 	}
 
+	static final Snippet INDEX_LINKS_SNIPPET = links(
+		linkWithRel("applications").description("The <<resources-applications,Applications resource>>"),
+		linkWithRel("outcomes").description("The <<resources-outcomes,Outcomes resource>>"),
+		linkWithRel("profile").description("The ALPS profile for the service")
+	);
+	
+	static final Snippet INDEX_RESPONSE_SNIPPET = responseFields(
+		fieldWithPath("_links").description("<<resources-index-links,Links>> to other resources")
+	);
+	
 	@Test
 	public void errorExample() throws Exception {
 		this.mockMvc
