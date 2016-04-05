@@ -1,14 +1,23 @@
 = EUPORIAS API Guide
-Predictia Intelligent Data Solutions;
+Work Package 44 - Delivery Tools;
 :doctype: book
 :icons: font
-:source-highlighter: highlightjs
+:source-highlighter: coderay
 :toc: left
 :toclevels: 4
 :sectlinks:
 
 [[overview]]
 = Overview
+
+The objective of http://www.euporias.eu/deliverables[Work Package 44] - Delivery Tools - is "to identify, develop, and maintain 
+an interface which will allow an effective delivery of the climate services developed in WP 42 to both the general public and
+the relevant decision-makers. In this manner, http://euporias.eu[EUPORIAS] goes beyond merely improving the reliability of the 
+underlying prediction systems to enhancing the usability of these forecast in practical applications".
+
+For this purpose, an API has been developed to deliver these outcomes in a homogeneous and standard way.
+
+This page documents this API and provides some practical examples.
 
 [[overview-http-verbs]]
 == HTTP verbs
@@ -372,3 +381,209 @@ include::{snippets}/outcomes-search-meta-example/curl-request.adoc[]
 ==== Example response
 
 include::{snippets}/outcomes-search-meta-example/http-response.adoc[]
+
+[[showcase]]
+= Showcase
+
+"The primary aim of the RESILIENCE prototype is to strengthen the efficiency and security of wind power supply within energy 
+networks, by providing robust information of the future variability in wind power resources based on probabilistic climate 
+predictions."
+-- http://resilience.euporias.eu/en/resilience_overview,
+
+The outcome of this prototype illustrates how seasonal wind predictions can lead to a safer, more efficient and therefore 
+cost-effective operation and planning of wind power within the wider energy system. These outcomes are displayed through 
+the http://project-ukko.net[UKKO project].
+
+In the following sections we will show how to interact with the API to get the forecasts produced by RESILIENCE. To this aim, we will
+build a web page displaying the forecasts over a map.
+
+The source code is available at https://github.com/Predictia/resilience-demo[GitHub]. 
+
+[[showcase-libraries]]
+== Libraries
+We will use the following libraries to build this example: 
+
+* http://leafletjs.com[Leaflet]
+* https://angularjs.org[Angular.js]
+* http://www.pixijs.com[Pixi.js]
+* https://github.com/ubilabs/kd-tree-javascript[k-d Tree JavaScript] 
+
+[[showcase-products]]
+== Products
+RESILIENCE forecasts are stored in two different products:
+
+* Global Forecast: a CSV file containing the forecasts for the world-wide. It has one parameter: the forecasts start date.
+* Point Details: a JSON file containing the details for a particular grid-box. It has one parameter: the grid-box identifier.
+
+[[showcase-token]]
+== Getting a token
+In order to get any outcome from the API it is needed a valid token. Therefore, we need to provide some information to get this token: 
+
+[source,javascript]
+----
+var domain = "http://api.euporias.eu"; // <1>
+var application = 6; // <2>
+var user = "RESILIENCE.ro"; // <3>
+var secret = "4e975e24-2124-4572-8b74-f6264907093e"; // <4>
+----
+<1> The URL where the API is deployed
+<2> The RESILIENCE application ID in the API server
+<3> The pre-defined user granted to read (and not to write) information from the application number 6
+<4> The secret password for the user RESILIENCE.ro
+
+With this information, we can make a post request to ask for a valid token. Following the http://oauth.net/2/[OAuth2] standard, the 
+credentials are encoded in https://en.wikipedia.org/wiki/Base64[Base64]:
+
+[source,javascript]
+----
+$http.defaults.useXDomain = true;
+delete $http.defaults.headers.common['X-Requested-With'];
+var postdata = 'grant_type=client_credentials&scope=read';
+var authdata = "Basic "+Base64.encode(user + ':' + secret);
+$http.post(domain+'oauth/token',postdata,{headers:{'Authorization':authdata,'Content-Type':'application/x-www-form-urlencoded'}})
+  .then(function(response){
+    d.resolve(response.data.access_token);
+});
+----
+
+In the https://github.com/Predictia/resilience-demo/blob/master/js/script.js[complete example], the http://www.w3schools.com/html/html5_webstorage.asp[LocalStorage] is used in order to store a 
+valid token and prevent unnecessary requests. So the complete OAuth2 authentication service will be: 
+
+[source,javascript]
+----
+.factory('OauthService',function($http,$q,$base64,$localStorage){
+ var user = "RESILIENCE.ro";
+ var secret = "4e975e24-2124-4572-8b74-f6264907093e";
+ $http.defaults.useXDomain = true;
+ delete $http.defaults.headers.common['X-Requested-With'];
+ return {
+  token:function(){
+   var d = $q.defer();
+   var key = "resilience_access_token";
+   var access_token = $localStorage[key];
+   if((typeof access_token=='undefined' || angular.equals({},access_token)) || Date.now() > (access_token.expires_at - (600*1000))){
+    var postdata = 'grant_type=client_credentials&scope=read';
+    var authdata = "Basic "+Base64.encode(user + ':' + secret);
+    $http.post(domain+'oauth/token',postdata,{headers:{'Authorization':authdata,'Content-Type':'application/x-www-form-urlencoded'}})
+    .then(function(response){
+      $localStorage[key] = {
+       key:response.data.access_token,
+       expires_at:Date.now()+(response.data.expires_in*1000)
+      };
+      d.resolve(response.data.access_token);
+    });
+   }else{
+	 d.resolve(access_token.key);
+   }
+   return d.promise;
+  }
+ };
+})
+----
+
+In the previous function, we use the https://docs.angularjs.org/api/ng/service/$q[$q] object following the http://wiki.commonjs.org/wiki/Promises[promise pattern].
+This pattern will allow us to chain services easily.
+
+[[showcase-metadata]]
+== Getting metadata
+
+In the following step we will get the most recent forecast. To do so, we use the `*outcomes/search/metadata*` facility 
+giving `*forecastStartTime*` as parameter:
+
+[source,javascript]
+----
+var queryMaxForecast = function(token){
+ var d = $q.defer();
+ $http.defaults.headers.common.Authorization = "Bearer "+token;
+  getdata = "application="+application+"&product=Global Forecast&parameter=forecastStartTime";
+  $http.get(domain+'outcomes/search/metadata?'+getdata)
+   .then(function(response){
+    var forecast = response.data._embedded.strings[0].content;
+    d.resolve({token:token,forecast:forecast});
+ });
+ return d.promise;
+};
+----
+Since the results are ordered from newest to oldest, we keep just the first item from the array.
+
+[[showcase-global]]
+== Getting the global forecast
+
+Finally, with a valid token and a forecast time, we can ask for the global forecast CSV file:
+
+[source,javascript]
+----
+var queryStations = function(token,forecastStartTime){
+  var d = $q.defer();
+  var key = "resilience_forecast-"+forecastStartTime;
+  var globalForecast = $localStorage[key];
+  if(typeof globalForecast=='undefined' || angular.equals({},globalForecast)){
+   $http.defaults.headers.common.Authorization = "Bearer "+token;
+    getdata = "application="+application+"&product=Global Forecast&forecastStartTime="+forecastStartTime;
+    $http.get(domain+'outcomes/search/parameters?'+getdata)
+     .then(function(response){
+       $localStorage[key] = response.data._embedded.outcomes;
+       d.resolve(response.data._embedded.outcomes);
+     });
+  }else{
+   d.resolve(globalForecast);
+  }
+ return d.promise;
+};
+----
+
+As in the token case, we use the http://www.w3schools.com/html/html5_webstorage.asp[LocalStorage] to prevent duplicated requests.
+
+Since the results are encoded using Base64 we need to decoded them:
+[source,javascript]
+----
+Base64.decode(data[0].results[0])
+----
+
+[[showcase-chain]]
+== 
+All of the previous steps make asynchronous request to get information from the API server. Angular.js makes easy to chain asynchronous request 
+when they follow the promise pattern: 	 
+
+[source,javascript]
+----
+GetStations:function(){
+ return OauthService.token() // <1>
+  .then(function(data){return queryMaxForecast(data)}) // <2>
+  .then(function(data){return queryStations(data.token,data.forecast)}) // <3>
+  .then(function(data){return Base64.decode(data[0].results[0])}); // <4>
+},
+----
+<1> Gets a valid token (from the API or the LocalStorage)
+<2> Gets the most recent forecast date
+<3> Gets the global forecast CSV file
+<4> Decodes the results 
+
+[[showcase-details]]
+== Station details
+
+In the same way, we can easily build a service to fetch a detailed grid-box information given a grid-box id: 
+
+[source,javascript]
+----
+var queryStationInfo = function(token,station){
+ var d = $q.defer();
+ $http.defaults.headers.common.Authorization = "Bearer "+token;
+  getdata = "application="+application+"&product=Point Details&stationId="+station;
+  $http.get(domain+'outcomes/search/parameters?'+getdata)
+    .then(function(response){
+      d.resolve(response.data._embedded.outcomes);
+    });
+  return d.promise;
+};
+----
+
+[[showcase-ui]]
+== User interface
+
+Finally, the home controller will use the previous services to get the information and display it over a Leaflet map.
+To do so, we use a canvas layer managed by Pixi.js to speed up the renderization process (there are several thousands of grid-boxes).
+Clicking on a grid-box, a popup window with its detailed information (observation and forecasts) is displayed.
+To resolve which grid-box is under a mouse event (mouseover or click), a https://en.wikipedia.org/wiki/K-d_tree[k-d Tree] is used.
+
+The example is running http://predictia.github.io/resilience-demo[here].
