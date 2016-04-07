@@ -1,0 +1,36 @@
+{
+  "_embedded" : {
+    "outcomes" : [ {
+      "product" : {
+        "name" : "test reports",
+        "parameters" : [ {
+          "name" : "reportName",
+          "parameterType" : "TEXT",
+          "description" : "name of the report"
+        } ]
+      },
+      "parameters" : {
+        "reportName" : "EUPORIAS PowerPoint Template"
+      },
+      "outcomeType" : "FILE",
+      "mimeType" : "applicationapplication/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "lastModifiedDate" : "2016-04-05T11:43:55.000+0000",
+      "_links" : {
+        "feedback" : {
+          "href" : "http://localhost:8080/outcomes/search/feedbacks?outcome=441"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/outcomes/search/parameters"
+    }
+  },
+  "page" : {
+    "size" : 0,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
