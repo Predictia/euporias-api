@@ -40,19 +40,7 @@ public class OutcomeEventHandler {
 		assignExistingProduct(outcome);
 		assertNewOutcome(outcome);
 		outcome.setLastModifiedDate(new Date());
-		if(OutcomeType.EMBEDDED_FILE.equals(outcome.getOutcomeType())){
-			outcome.setResults(outcome.getResults().stream()
-				.map((base64text) -> {
-					try {
-						File f = storageService.storeFile(decodeBase64ToFile(base64text));
-						return storageService.relativeFilePath(f);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.collect(Collectors.toList())
-			);
-		}
+		assignEmbededFile(outcome);
 	}
 	
 	private void assignExistingProduct(Outcome outcome){
@@ -87,6 +75,7 @@ public class OutcomeEventHandler {
 	public void handleOutcomeSave(Outcome outcome) {
 		assignExistingProduct(outcome);
 		outcome.setLastModifiedDate(new Date());
+		assignEmbededFile(outcome);
 	}
 	
 	@HandleBeforeDelete
@@ -101,6 +90,22 @@ public class OutcomeEventHandler {
 						f.delete();
 					});
 			}
+		}
+	}
+	
+	private void assignEmbededFile(Outcome outcome){
+		if(OutcomeType.EMBEDDED_FILE.equals(outcome.getOutcomeType())){
+			outcome.setResults(outcome.getResults().stream()
+				.map((base64text) -> {
+					try {
+						File f = storageService.storeFile(decodeBase64ToFile(base64text));
+						return storageService.relativeFilePath(f);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.collect(Collectors.toList())
+			);
 		}
 	}
 	
