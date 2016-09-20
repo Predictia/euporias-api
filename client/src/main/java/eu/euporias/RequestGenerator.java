@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -125,7 +126,10 @@ public class RequestGenerator {
 		put.setHeader("Authorization", "Bearer "+token);
 		put.setHeader("Content-type", JSON_DEFINITION);
 		HttpResponse response = httpClient().execute(put);
-		return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+		HttpEntity responseEntity = response.getEntity();
+		return responseEntity != null ? 
+			IOUtils.toString(responseEntity.getContent(), "UTF-8") : 
+			response.getStatusLine().toString();
 	}
 	
 	private String jsonPost(ArgumentList parameters,ArgumentList extraParameters) throws IOException{
