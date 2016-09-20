@@ -94,8 +94,9 @@ public class ApplicationDocumentation {
 	}
 	
 	private void applicationsUpdateExample() throws Exception {
-		Product product = application.getProducts().iterator().next();
-		product.setId(null);
+		Product eProduct = application.getProducts().iterator().next();
+		Product product = new Product();
+		product.setName(eProduct.getName());
 		product.setParameters(Stream.of(
 			parameter("reportName", "new name of the report", ParameterType.TEXT, null),
 			parameter("stationId", "code of the station", ParameterType.NUMBER, "0"),
